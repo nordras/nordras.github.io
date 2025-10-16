@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from '../../components/BaseHead.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -11,7 +11,7 @@ const posts = (await getCollection('blog')).sort(
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Blog - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
 	<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 		<!-- Header -->
@@ -23,7 +23,12 @@ const posts = (await getCollection('blog')).sort(
 							<a href="/main">Dev<span class="text-blue-600 dark:text-blue-400">Blog</span></a>
 						</h1>
 					</div>
-					<div class="flex items-center">
+					<div class="flex items-center space-x-4">
+						<nav class="hidden md:flex space-x-8">
+							<a href="/main" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
+							<a href="/main/blog" class="text-blue-600 dark:text-blue-400 font-medium">Blog</a>
+							<a href="/main/about" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Sobre</a>
+						</nav>
 						<button id="theme-toggle" class="theme-toggle flex items-center justify-center w-10 h-10">
 							<svg id="sun-icon" class="w-5 h-5 text-yellow-500 hidden" fill="currentColor" viewBox="0 0 20 20">
 								<path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
@@ -38,13 +43,13 @@ const posts = (await getCollection('blog')).sort(
 		</header>
 
 		<!-- Hero Section -->
-		<section class="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white transition-colors duration-300">
+		<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white transition-colors duration-300">
 			<div class="max-w-4xl mx-auto text-center">
-				<h1 class="text-3xl md:text-4xl font-bold mb-3">
-					Blog de Desenvolvimento
+				<h1 class="text-4xl md:text-5xl font-bold mb-4">
+					Todos os Artigos
 				</h1>
-				<p class="text-lg text-blue-100 dark:text-blue-200">
-					Artigos, tutoriais e dossiers sobre JavaScript, React e tecnologias modernas
+				<p class="text-xl text-blue-100 dark:text-blue-200">
+					Explore nosso conteúdo sobre desenvolvimento web
 				</p>
 			</div>
 		</section>
@@ -110,16 +115,40 @@ const posts = (await getCollection('blog')).sort(
 		</main>
 
 		<!-- Footer -->
-		<footer class="bg-gray-900 dark:bg-black text-white py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-			<div class="max-w-7xl mx-auto text-center">
-				<h3 class="text-xl font-bold mb-4">
-					Dev<span class="text-blue-400">Blog</span>
-				</h3>
-				<p class="text-gray-400 dark:text-gray-300 mb-4 max-w-2xl mx-auto">
-					Conteúdo de qualidade sobre desenvolvimento web, com foco em JavaScript, React e tecnologias modernas.
-				</p>
-				<div class="border-t border-gray-800 dark:border-gray-700 mt-6 pt-6">
-					<p class="text-gray-400 dark:text-gray-300">&copy; 2025 DevBlog. Todos os direitos reservados.</p>
+		<footer class="bg-gray-900 dark:bg-black text-white py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+			<div class="max-w-7xl mx-auto">
+				<div class="grid md:grid-cols-4 gap-8">
+					<div class="md:col-span-2">
+						<h3 class="text-2xl font-bold mb-4">
+							Dev<span class="text-blue-400">Blog</span>
+						</h3>
+						<p class="text-gray-400 dark:text-gray-300 mb-4">
+							Conteúdo de qualidade sobre desenvolvimento web, com foco em JavaScript, React e tecnologias modernas.
+						</p>
+					</div>
+					
+					<div>
+						<h4 class="font-bold mb-4">Links</h4>
+						<ul class="space-y-2 text-gray-400 dark:text-gray-300">
+							<li><a href="/main" class="hover:text-white transition-colors">Home</a></li>
+							<li><a href="/main/blog" class="hover:text-white transition-colors">Blog</a></li>
+							<li><a href="/main/about" class="hover:text-white transition-colors">Sobre</a></li>
+						</ul>
+					</div>
+					
+					<div>
+						<h4 class="font-bold mb-4">Categorias</h4>
+						<ul class="space-y-2 text-gray-400 dark:text-gray-300">
+							<li><a href="#" class="hover:text-white transition-colors">JavaScript</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">React</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">Node.js</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">CSS</a></li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="border-t border-gray-800 dark:border-gray-700 mt-8 pt-8 text-center text-gray-400 dark:text-gray-300">
+					<p>&copy; 2025 DevBlog. Todos os direitos reservados.</p>
 				</div>
 			</div>
 		</footer>
