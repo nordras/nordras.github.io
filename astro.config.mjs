@@ -11,7 +11,7 @@ import react from '@astrojs/react';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://nordras.github.io',
-  base: '/main',
+  base: '/',
   integrations: [mdx(), sitemap(), react()],
 
   vite: {
