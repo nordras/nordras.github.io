@@ -5,19 +5,26 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import { useTranslations } from '../i18n/utils';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, language } = Astro.props;
+const t = useTranslations(language);
+
+// Determine the correct home link based on language
+const homeLink = language === 'en' ? '/en/' : '/';
+const backText = language === 'en' ? 'Back to Blog' : 'Voltar ao Blog';
+const updatedText = language === 'en' ? 'Updated on' : 'Atualizado em';
 ---
 
-<html lang="en">
+<html lang={language}>
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead title={title} description={description} lang={language} />
 	</head>
 
 	<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-		<Header />
+		<Header lang={language} />
 		<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 			<article class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
 				{heroImage && (
@@ -38,7 +45,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							<FormattedDate date={pubDate} />
 							{updatedDate && (
 								<div class="text-sm italic mt-1">
-									Atualizado em <FormattedDate date={updatedDate} />
+									{updatedText} <FormattedDate date={updatedDate} />
 								</div>
 							)}
 						</div>
@@ -60,13 +67,13 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			
 			<div class="mt-8 text-center">
 				<a 
-					href="/" 
+					href={homeLink} 
 					class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
 				>
-					← Voltar ao Blog
+					← {backText}
 				</a>
 			</div>
 		</main>
-		<Footer />
+		<Footer lang={language} />
 	</body>
 </html>

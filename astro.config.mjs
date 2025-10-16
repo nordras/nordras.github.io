@@ -12,6 +12,16 @@ import react from '@astrojs/react';
 export default defineConfig({
   site: 'https://nordras.github.io',
   base: '/',
+  
+  // Configuração i18n
+  i18n: {
+    defaultLocale: 'pt',
+    locales: ['pt', 'en'],
+    routing: {
+      prefixDefaultLocale: false
+    }
+  },
+  
   integrations: [mdx(), sitemap(), react()],
 
   vite: {

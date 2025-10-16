@@ -15,6 +15,11 @@ Features:
 - ✅ RSS Feed support
 - ✅ Markdown & MDX support
 
+Thins to implement
+    Giscus for commentaries
+        https://giscus.app/pt
+        https://www.maxpou.fr/blog/giscus-with-astro/
+
 ## 🚀 Project Structure
 
 Inside of your Astro project, you'll see the following folders and files:

@@ -2,6 +2,7 @@
 title: 'React Hello World - Seu Primeiro Componente'
 description: 'Aprenda a criar seu primeiro componente React com um exemplo prático de Hello World, incluindo conceitos básicos e boas práticas.'
 pubDate: 'Oct 16 2025'
+language: 'pt'
 ---
 
 # React Hello World - Seu Primeiro Componente

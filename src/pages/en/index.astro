@@ -1,24 +1,24 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { useTranslations, getDateFormatter } from '../i18n/utils';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { useTranslations, getDateFormatter } from '../../i18n/utils';
 
-const lang = 'pt';
+const lang = 'en';
 const t = useTranslations(lang);
 const formatDate = getDateFormatter(lang);
 
-// Filtrar posts em português
+// Filter posts in English
 const allPosts = await getCollection('blog');
 const posts = allPosts
-	.filter(post => post.data.language === 'pt')
+	.filter(post => post.data.language === 'en')
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
-<html lang="pt">
+<html lang="en">
 	<head>
 		<BaseHead title={t('blog.title')} description={t('meta.description')} lang={lang} />
 	</head>
@@ -54,7 +54,7 @@ const posts = allPosts
 							</div>
 							
 							<h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-								<a href={`/blog/${post.id}/`}>
+								<a href={`/en/blog/${post.id}/`}>
 									{post.data.title}
 								</a>
 							</h2>
@@ -70,7 +70,7 @@ const posts = allPosts
 									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
 								</span>
 								<a 
-									href={`/blog/${post.id}/`}
+									href={`/en/blog/${post.id}/`}
 									class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm flex items-center"
 								>
 									{t('blog.readMore')} →
