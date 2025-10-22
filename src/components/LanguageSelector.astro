@@ -13,12 +13,15 @@ const languages = [
 	{ code: 'pt', name: 'Português', flag: '🇧🇷' },
 	{ code: 'en', name: 'English', flag: '🇺🇸' },
 ] as const;
+
+// Verificar se estamos em um post de blog
+const isOnBlogPost = currentUrl.includes('/blog/');
 ---
 
 <div class="relative inline-block text-left">
 	<select 
 		id="language-selector" 
-		class="bg-white dark:bg-white-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+		class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-gray-900 dark:text-white"
 	>
 		{languages.map((lang) => (
 			<option 
@@ -26,6 +29,7 @@ const languages = [
 				selected={lang.code === currentLang}
 			>
 				{lang.flag} {lang.name}
+				{isOnBlogPost && lang.code !== currentLang ? ' (vai para início)' : ''}
 			</option>
 		))}
 	</select>
@@ -33,8 +37,25 @@ const languages = [
 
 <script>
 	const selector = document.getElementById('language-selector') as HTMLSelectElement;
+	
 	selector?.addEventListener('change', (e) => {
 		const target = e.target as HTMLSelectElement;
-		window.location.href = target.value;
+		const selectedUrl = target.value;
+		
+		// Se a URL vai para a home, mostrar confirmação
+		const isGoingToHome = selectedUrl === '/' || selectedUrl === '/en/';
+		const isCurrentlyOnPost = window.location.pathname.includes('/blog/');
+		
+		if (isGoingToHome && isCurrentlyOnPost) {
+			const confirmed = confirm('Este post não está disponível no idioma selecionado. Deseja ir para a página inicial?');
+			if (confirmed) {
+				window.location.href = selectedUrl;
+			} else {
+				// Restaurar seleção anterior
+				target.value = window.location.pathname;
+			}
+		} else {
+			window.location.href = selectedUrl;
+		}
 	});
 </script>
