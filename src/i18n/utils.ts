@@ -20,6 +20,15 @@ const postMapping: Record<string, Record<Language, string>> = {
     pt: 'o-que-e-react',
     en: 'what-is-react'
   },
+  // React Hooks Internals
+  'react-hooks-internals': {
+    pt: 'react-hooks-internals',
+    en: 'react-hooks-internals-en'
+  },
+  'react-hooks-internals-en': {
+    pt: 'react-hooks-internals',
+    en: 'react-hooks-internals-en'
+  },
   // Posts sem tradução (redirecionam para home)
   'using-mdx': {
     pt: 'using-mdx',
