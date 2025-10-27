@@ -7,15 +7,13 @@ tags: ['react', 'hooks', 'internals', 'fiber', 'avançado', 'javascript']
 language: 'pt'
 ---
 
-# Como React Hooks Funcionam Internamente - Por Baixo dos Panos
-
 ## Introdução
 
-Você já se perguntou como o React consegue "lembrar" do estado dos seus hooks entre re-renderizações? Como o `useState` sabe qual estado pertence a qual componente? A resposta está na arquitetura interna do React e no conceito de **fibers**.
+Certo, se você chegou aqui é talvez queira fazer um trabalho de faculdade, uma poc elaborada ou seja um curioso de plantão. <b><i>Então como o `useState` armazena dados</i></b>? A resposta está na arquitetura interna do React e no conceito de **fibers**.
 
-Neste post, vamos mergulhar profundamente no funcionamento interno dos React Hooks, explorando como eles mantêm estado através de uma implementação simplificada que demonstra os conceitos fundamentais.
+Neste post pretendo explicar o funcionamento interno dos React Hooks, explorando como eles mantêm estado através de uma implementação simplificada que demonstra os conceitos fundamentais.
 
-## O Problema: Como Hooks Sabem Onde Estão?
+## Como Hooks Sabem Onde Estão?
 
 React Hooks são apenas funções JavaScript. Quando você escreve:
 
@@ -28,7 +26,7 @@ function MyComponent() {
 }
 ```
 
-Como o React sabe que o primeiro `useState` é para `count` e o segundo é para `name`? Como ele mantém esses estados separados entre diferentes instâncias do mesmo componente?
+Como é decidido que o primeiro `useState` é para `count` e o segundo é para `name`? Como ele mantém esses estados separados entre diferentes instâncias do mesmo componente?
 
 **A resposta:** Através de uma **lista ligada de hooks** e um **cursor de posição** que avança a cada chamada de hook.
 
@@ -245,12 +243,93 @@ console.log(render3.children.count); // 5
 
 ## Por Que Isso Funciona?
 
-O segredo está na **associação de contexto**:
+O segredo está na **lista ligada + ordem consistente**:
 
-1. **Timing**: O renderer React chama a função do componente
-2. **Contexto**: Durante essa chamada, os hooks sabem qual instância está ativa
-3. **Persistência**: O estado é armazenado fora do componente, no sistema de fibers
-4. **Consistência**: A mesma ordem de chamada garante que hooks acessem o estado correto
+### Fluxo Detalhado de uma Renderização
+
+**1. Primeira Renderização (Mount)**
+```
+Antes: fiber.memoizedState = null
+
+useState(0)    → Cria Hook1 {memoizedState: 0, next: null}
+                 fiber.memoizedState = Hook1
+                 
+useState('')   → Cria Hook2 {memoizedState: '', next: null}
+                 Hook1.next = Hook2
+                 
+useState([])   → Cria Hook3 {memoizedState: [], next: null}
+                 Hook2.next = Hook3
+
+Depois: fiber.memoizedState → Hook1 → Hook2 → Hook3 → null
+```
+
+**2. Re-renderização (Update)**
+```
+Antes: currentHook = fiber.memoizedState (Hook1)
+
+useState(0)    → Lê Hook1, currentHook = Hook1.next (Hook2)
+useState('')   → Lê Hook2, currentHook = Hook2.next (Hook3)
+useState([])   → Lê Hook3, currentHook = Hook3.next (null)
+
+Depois: Mesma lista, valores possivelmente atualizados
+```
+
+### Diagrama de Fluxo Visual
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    COMPONENTE                            │
+│                                                          │
+│  function Counter() {                                   │
+│    const [count, setCount] = useState(0);     ←─┐       │
+│    const [step, setStep] = useState(1);       ←─┼─┐     │
+│    const [name, setName] = useState('');      ←─┼─┼─┐   │
+│  }                                              │ │ │   │
+└─────────────────────────────────────────────────┼─┼─┼───┘
+                                                  │ │ │
+                    ┌─────────────────────────────┘ │ │
+                    │         ┌─────────────────────┘ │
+                    │         │         ┌─────────────┘
+                    ▼         ▼         ▼
+            ┌────────┐  ┌────────┐  ┌────────┐
+            │ Hook 1 │─→│ Hook 2 │─→│ Hook 3 │─→ null
+            │count: 0│  │step: 1 │  │name:'' │
+            │queue:[]│  │queue:[]│  │queue:[]│
+            └────────┘  └────────┘  └────────┘
+                    ▲
+                    │
+            fiber.memoizedState
+```
+
+### Por Que a Ordem Importa
+
+Se você quebrar a ordem, a lista ligada fica corrompida:
+
+```javascript
+// ❌ ERRADO - Ordem inconsistente
+function BadComponent({ condition }) {
+  const [a] = useState('a');
+  
+  if (condition) {
+    const [b] = useState('b');  // ❌ Hook condicional!
+  }
+  
+  const [c] = useState('c');
+}
+```
+
+**Primeira renderização** (condition = true):
+```
+Hook1(a) → Hook2(b) → Hook3(c) → null
+```
+
+**Segunda renderização** (condition = false):
+```
+Hook1(a) → Hook2(c) → null
+         ⚠️ Hook2 deveria ser 'b', mas recebe 'c'!
+```
+
+**Resultado**: Estado corrompido! 💥
 
 ## Limitações e Regras dos Hooks
 
@@ -289,38 +368,256 @@ function GoodComponent() {
 
 ## Hooks Avançados
 
-Assim como `useState`, outros hooks seguem o mesmo padrão:
+Assim como `useState`, outros hooks seguem o mesmo padrão de lista ligada:
 
 ### useEffect
 
 ```javascript
-const compEffects = new Map();
-
 function useEffect(callback, deps) {
-  const instance = currentlyRenderedCompInstance;
-  const prevDeps = compEffects.get(instance);
+  let hook;
   
-  // Verifica se as dependências mudaram
-  const hasChanged = !prevDeps || 
-    !deps || 
-    deps.some((dep, i) => dep !== prevDeps[i]);
-  
-  if (hasChanged) {
-    callback();
-    compEffects.set(instance, deps);
+  if (currentHook === null) {
+    // Mount: cria novo hook
+    hook = {
+      memoizedState: {
+        effect: callback,
+        deps: deps,
+        destroy: undefined  // cleanup function
+      },
+      next: null
+    };
+    
+    if (workInProgressHook === null) {
+      currentlyRenderingFiber.memoizedState = hook;
+      workInProgressHook = hook;
+    } else {
+      workInProgressHook.next = hook;
+      workInProgressHook = hook;
+    }
+    
+    // Agenda execução do effect
+    scheduleEffect(hook);
+  } else {
+    // Update: compara dependências
+    hook = currentHook;
+    const prevEffect = hook.memoizedState;
+    
+    const hasChanged = !deps || !prevEffect.deps ||
+      deps.some((dep, i) => !Object.is(dep, prevEffect.deps[i]));
+    
+    if (hasChanged) {
+      hook.memoizedState = {
+        effect: callback,
+        deps: deps,
+        destroy: prevEffect.destroy
+      };
+      scheduleEffect(hook);
+    }
+    
+    currentHook = currentHook.next;
   }
 }
 ```
 
-### useContext
+### useRef
 
 ```javascript
-const compContexts = new Map();
-
-function useContext(context) {
-  const instance = currentlyRenderedCompInstance;
-  return compContexts.get(instance)?.get(context) || context.defaultValue;
+function useRef(initialValue) {
+  let hook;
+  
+  if (currentHook === null) {
+    // Mount: cria objeto ref
+    hook = {
+      memoizedState: { current: initialValue },
+      next: null
+    };
+    
+    if (workInProgressHook === null) {
+      currentlyRenderingFiber.memoizedState = hook;
+      workInProgressHook = hook;
+    } else {
+      workInProgressHook.next = hook;
+      workInProgressHook = hook;
+    }
+  } else {
+    // Update: mantém a mesma referência
+    hook = currentHook;
+    currentHook = currentHook.next;
+  }
+  
+  return hook.memoizedState;  // Sempre o mesmo objeto
 }
+```
+
+## Batching de Atualizações e Update Queue
+
+Uma das otimizações mais importantes do React é o **batching**: múltiplas atualizações de estado resultam em apenas uma re-renderização.
+
+### Como Funciona a Update Queue
+
+Cada hook tem uma **fila de atualizações**:
+
+```javascript
+const hook = {
+  memoizedState: currentValue,
+  baseState: baseValue,
+  queue: {
+    pending: null,  // Circular linked list de updates
+    dispatch: setState,
+    lastRenderedState: currentValue
+  },
+  next: nextHook
+};
+```
+
+### Implementação Realista com Update Queue
+
+```javascript
+function useState(initialState) {
+  let hook;
+  
+  if (currentHook === null) {
+    // Mount
+    hook = {
+      memoizedState: initialState,
+      baseState: initialState,
+      queue: {
+        pending: null,
+        dispatch: null
+      },
+      next: null
+    };
+    
+    // Adiciona à lista ligada...
+    if (workInProgressHook === null) {
+      currentlyRenderingFiber.memoizedState = hook;
+      workInProgressHook = hook;
+    } else {
+      workInProgressHook.next = hook;
+      workInProgressHook = hook;
+    }
+  } else {
+    // Update
+    hook = currentHook;
+    currentHook = currentHook.next;
+  }
+  
+  // Cria dispatch se ainda não existe
+  if (!hook.queue.dispatch) {
+    hook.queue.dispatch = dispatchAction.bind(null, 
+      currentlyRenderingFiber, 
+      hook.queue
+    );
+  }
+  
+  // Processa updates pendentes
+  if (hook.queue.pending !== null) {
+    const newState = processUpdateQueue(
+      hook.baseState, 
+      hook.queue.pending
+    );
+    hook.memoizedState = newState;
+    hook.queue.pending = null;
+  }
+  
+  return [hook.memoizedState, hook.queue.dispatch];
+}
+
+function dispatchAction(fiber, queue, action) {
+  // Cria um update object
+  const update = {
+    action,
+    next: null
+  };
+  
+  // Adiciona à circular linked list
+  const pending = queue.pending;
+  if (pending === null) {
+    // Primeira update - cria lista circular
+    update.next = update;
+  } else {
+    // Insere na lista circular
+    update.next = pending.next;
+    pending.next = update;
+  }
+  queue.pending = update;
+  
+  // Agenda re-render
+  scheduleUpdateOnFiber(fiber);
+}
+
+function processUpdateQueue(baseState, pendingQueue) {
+  let update = pendingQueue.next;  // Começo da lista circular
+  let newState = baseState;
+  
+  // Processa cada update na fila
+  do {
+    const action = update.action;
+    newState = typeof action === 'function' 
+      ? action(newState) 
+      : action;
+    update = update.next;
+  } while (update !== pendingQueue.next);
+  
+  return newState;
+}
+```
+
+### Exemplo de Batching
+
+```javascript
+function Component() {
+  const [count, setCount] = useState(0);
+  
+  function handleClick() {
+    setCount(1);      // Update 1 → queue
+    setCount(2);      // Update 2 → queue
+    setCount(c => c + 1); // Update 3 → queue
+    // Apenas 1 re-render será agendado!
+  }
+  
+  // Quando re-render acontecer:
+  // processUpdateQueue(0, [1, 2, c=>c+1])
+  // → 1 → 2 → 3 (resultado final)
+}
+```
+
+### Visualização da Update Queue
+
+```
+Antes dos setStates:
+hook.queue.pending = null
+hook.memoizedState = 0
+
+Após setCount(1):
+┌─────────┐
+│ Update1 │◄─┐
+│ action:1│  │
+└─────┬───┘  │
+      └──────┘
+hook.queue.pending → Update1
+
+Após setCount(2):
+┌─────────┐   ┌─────────┐
+│ Update1 │──→│ Update2 │◄─┐
+│ action:1│   │ action:2│  │
+└─────────┘   └─────┬───┘  │
+      ▲             └──────┘
+      └──────────────────────
+hook.queue.pending → Update2
+
+Após setCount(c => c+1):
+┌─────────┐   ┌─────────┐   ┌─────────┐
+│ Update1 │──→│ Update2 │──→│ Update3 │◄─┐
+│ action:1│   │ action:2│   │ action:fn│  │
+└─────────┘   └─────────┘   └─────┬───┘  │
+      ▲                            └──────┘
+      └────────────────────────────────────
+hook.queue.pending → Update3 (circular!)
+
+Durante re-render:
+Processa: 1 → 2 → fn(2) = 3
+Resultado: hook.memoizedState = 3
 ```
 
 ## React Fiber: A Implementação Real
@@ -387,27 +684,131 @@ test('component state persistence', () => {
 });
 ```
 
+## A Fiber Tree e Hooks
+
+Cada componente React é representado por um **Fiber node** na árvore de renderização. Os hooks ficam armazenados nesse Fiber:
+
+```javascript
+const fiber = {
+  type: Component,           // Função do componente
+  memoizedState: null,       // ← Primeiro hook da lista ligada
+  memoizedProps: {},
+  stateNode: null,
+  return: parentFiber,       // Pai na árvore
+  child: firstChildFiber,    // Primeiro filho
+  sibling: nextSiblingFiber, // Próximo irmão
+  alternate: null,           // Versão anterior (double buffering)
+  // ... outros campos
+};
+```
+
+### Fluxo Completo de Renderização
+
+```
+1. React chama seu componente
+   └─→ currentlyRenderingFiber = fiber do componente
+       currentHook = null
+       workInProgressHook = null
+
+2. Componente chama useState()
+   ├─→ Mount: cria novo hook, adiciona à fiber.memoizedState
+   └─→ Update: lê hook existente, avança currentHook
+
+3. Componente chama useState() novamente
+   ├─→ Mount: adiciona hook.next ao último workInProgressHook
+   └─→ Update: lê currentHook.next
+
+4. Componente retorna JSX
+   └─→ React limpa currentlyRenderingFiber, currentHook, etc.
+
+5. Usuário dispara setState()
+   └─→ Adiciona update à queue circular do hook
+       Agenda re-render do fiber
+       
+6. Na próxima renderização, volta ao passo 1
+```
+
+### Visualização da Fiber Tree
+
+```
+       App Fiber
+       memoizedState → Hook1 → Hook2 → null
+            ↓
+      ┌────────────┐
+      ↓            ↓
+  Counter      Profile
+  Fiber        Fiber
+  memoizedState → Hook1 → Hook2 → Hook3 → null
+  (count)        (name)  (email)  (bio)
+```
+
+Cada Fiber tem sua **própria lista ligada de hooks**, completamente independente.
+
 ## Conclusão
 
-React Hooks são uma abstração elegante sobre um sistema complexo de gerenciamento de estado. A "mágica" acontece através de:
+Agora você conhece os bastidores do React Hooks! Os principais aprendizados:
 
-1. **Contexto global** que identifica o componente atual
-2. **Mapeamento** entre componentes e seus estados
-3. **Ordem consistente** de chamada dos hooks
-4. **Sistema de fibers** para gerenciamento eficiente
+### Estrutura de Dados
+- **Lista Ligada**: Cada Fiber mantém uma linked list de hooks (`Hook1 → Hook2 → Hook3 → null`)
+- **Hook Object**: `{memoizedState, baseState, queue, next}` armazena estado, updates pendentes e o próximo hook
+- **Update Queue**: Lista circular de updates para batching (`Update1 → Update2 → Update3 → Update1`)
 
-Compreender esses conceitos não apenas satisfaz a curiosidade técnica, mas também torna você um desenvolvedor React mais competente, capaz de:
+### Algoritmo de Cursor
+- **Mount Phase**: Cria novos hooks e os adiciona à lista ligada
+- **Update Phase**: Percorre a lista existente com um cursor (`currentHook`)
+- **Ordem Importa**: O cursor avança sequencialmente, hooks devem ser chamados na mesma ordem sempre
 
-- Debuggar problemas complexos
-- Escrever código mais performático
-- Evitar bugs relacionados às regras dos hooks
-- Contribuir para projetos open source do ecossistema React
+### Por Que as Regras Existem
 
-## Recursos Adicionais
+1. **Não chame hooks dentro de condições**
+   ```javascript
+   // ❌ NUNCA faça isso
+   if (condition) {
+     useState(0);  // Hook pode sumir!
+   }
+   ```
+   → Corrompe a lista ligada, causando mismatch entre mount e update
+
+2. **Apenas em componentes React ou custom hooks**
+   ```javascript
+   // ❌ Hook fora de componente
+   const value = useState(0);  // Sem fiber context!
+   ```
+   → Sem `currentlyRenderingFiber`, não há onde armazenar a lista de hooks
+
+3. **No nível superior**
+   ```javascript
+   // ❌ Hook em callback
+   useEffect(() => {
+     useState(0);  // Cursor já foi resetado!
+   }, []);
+   ```
+   → Hooks só funcionam durante a fase de renderização do componente
+
+### Performance
+
+- **Batching**: Múltiplos `setState` resultam em uma única re-renderização
+- **Update Queue**: Processa todas as atualizações de uma vez
+- **Fiber Architecture**: Double buffering permite React interromper e retomar trabalho
+
+### Indo Além
+
+Este modelo mostra os conceitos core. No React real há features avançadas:
+- **Concurrent Mode**: Interrompe renderização para tarefas urgentes
+- **Lanes**: Sistema de prioridades para updates
+- **useTransition**: Marca updates como não-urgentes
+- **Suspense**: Aguarda dados assíncronos na árvore de componentes
+
+Compreender esses internals não só explica as "Regras dos Hooks", mas revela a elegância da arquitetura do React. A lista ligada é uma escolha de design brilhante: simples, eficiente e permite features avançadas como time-slicing.
+
+## Recursos Adicionais e Fontes
 
 - [React Fiber Architecture](https://github.com/acdlite/react-fiber-architecture)
 - [React Hooks RFC](https://github.com/reactjs/rfcs/blob/main/text/0068-react-hooks.md)
+- [Código-fonte: ReactFiberHooks.js](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberHooks.js)
+- [React Fiber - O que muda agora?](https://raphamorim.io/entendendo-react-fiber/)
+- [A deep dive into React Fiber](https://blog.logrocket.com/deep-dive-react-fiber/)
 
 ---
 
-*Este post oferece uma visão simplificada dos conceitos internos. A implementação real do React é significativamente mais complexa e otimizada.*
+*Este post oferece uma visão aprofundada dos conceitos internos. A implementação real do React inclui otimizações adicionais e casos edge.*

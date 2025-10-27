@@ -318,3 +318,10 @@
   }
 }
 
+/* Custom utilities */
+@layer utilities {
+  .max-w-blog {
+    max-width: 1480px;
+    width: 100%;
+  }
+}
