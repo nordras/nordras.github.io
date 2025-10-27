@@ -22,16 +22,16 @@ const posts = allPosts
 	<head>
 		<BaseHead title={t('blog.title')} description={t('meta.description')} lang={lang} />
 	</head>
-	<body class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+	<body class="bg-slate-900 transition-colors duration-300">
 		<Header lang={lang} />
 
 		<!-- Hero Section -->
-		<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 via-blue-700 to-sky-600 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 text-white transition-colors duration-300">
+		<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white transition-colors duration-300">
 			<div class="max-w-4xl mx-auto text-center">
-				<h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+				<h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
 					{t('blog.title')}
 				</h1>
-				<p class="text-xl text-blue-50 dark:text-slate-300 max-w-2xl mx-auto">
+				<p class="text-xl text-slate-300 max-w-2xl mx-auto">
 					{t('blog.subtitle')}
 				</p>
 			</div>
@@ -41,37 +41,37 @@ const posts = allPosts
 		<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 				{posts.map((post) => (
-					<article class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-xl hover:border-blue-300 dark:hover:border-cyan-400 transition-all duration-300">
+					<article class="bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-hidden hover:shadow-xl hover:border-cyan-400 transition-all duration-300">
 						<div class="p-6">
 							<div class="flex items-center justify-between mb-4">
-								<span class="px-3 py-1 bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-cyan-300 rounded-full text-sm font-medium border border-blue-200 dark:border-slate-600">
+								<span class="px-3 py-1 bg-slate-700 text-cyan-300 rounded-full text-sm font-medium border border-slate-600">
 									{post.data.title.includes('JavaScript') ? 'JavaScript' : 
 									 post.data.title.includes('React') ? 'React' : 'Development'}
 								</span>
-								<span class="text-slate-500 dark:text-slate-400 text-sm">
+								<span class="text-slate-400 text-sm">
 									{formatDate(post.data.pubDate)}
 								</span>
 							</div>
 							
-							<h2 class="text-xl font-bold text-slate-900 dark:text-slate-50 mb-3 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">
+							<h2 class="text-xl font-bold text-slate-50 mb-3 hover:text-cyan-400 transition-colors">
 								<a href={`/blog/${post.id}/`}>
 									{post.data.title}
 								</a>
 							</h2>
 							
 							{post.data.description && (
-								<p class="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
+								<p class="text-slate-300 mb-4 leading-relaxed">
 									{post.data.description}
 								</p>
 							)}
 							
 							<div class="flex items-center justify-between">
-								<span class="text-slate-500 dark:text-slate-400 text-sm">
+								<span class="text-slate-400 text-sm">
 									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
 								</span>
 								<a 
 									href={`/blog/${post.id}/`}
-									class="text-blue-600 dark:text-cyan-400 hover:text-blue-700 dark:hover:text-cyan-300 font-medium text-sm flex items-center gap-1 group"
+									class="text-cyan-400 hover:text-cyan-300 font-medium text-sm flex items-center gap-1 group"
 								>
 									{t('blog.readMore')} 
 									<span class="group-hover:translate-x-1 transition-transform">→</span>
@@ -84,10 +84,10 @@ const posts = allPosts
 
 			{posts.length === 0 && (
 				<div class="text-center py-16">
-					<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-4">
+					<h2 class="text-2xl font-bold text-slate-50 mb-4">
 						{t('blog.noPosts')}
 					</h2>
-					<p class="text-slate-600 dark:text-slate-300">
+					<p class="text-slate-300">
 						{t('blog.noPostsDesc')}
 					</p>
 				</div>
@@ -95,44 +95,5 @@ const posts = allPosts
 		</main>
 
 		<Footer lang={lang} />
-
-		<script>
-			// Theme toggle functionality
-			const themeToggle = document.getElementById('theme-toggle');
-			const sunIcon = document.getElementById('sun-icon');
-			const moonIcon = document.getElementById('moon-icon');
-			
-			// Check for saved theme or default to system preference
-			const savedTheme = localStorage.getItem('theme');
-			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-			
-			// Set initial theme
-			if (isDark) {
-				document.documentElement.classList.add('dark');
-				sunIcon?.classList.remove('hidden');
-				moonIcon?.classList.add('hidden');
-			} else {
-				sunIcon?.classList.add('hidden');
-				moonIcon?.classList.remove('hidden');
-			}
-			
-			// Theme toggle handler
-			themeToggle?.addEventListener('click', () => {
-				const isDarkMode = document.documentElement.classList.contains('dark');
-				
-				if (isDarkMode) {
-					document.documentElement.classList.remove('dark');
-					localStorage.setItem('theme', 'light');
-					sunIcon?.classList.add('hidden');
-					moonIcon?.classList.remove('hidden');
-				} else {
-					document.documentElement.classList.add('dark');
-					localStorage.setItem('theme', 'dark');
-					sunIcon?.classList.remove('hidden');
-					moonIcon?.classList.add('hidden');
-				}
-			});
-		</script>
 	</body>
 </html>

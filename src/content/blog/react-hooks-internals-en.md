@@ -299,7 +299,6 @@ Understanding these concepts not only satisfies technical curiosity but also mak
 ## Additional Resources
 
 - [React Fiber Architecture](https://github.com/acdlite/react-fiber-architecture)
-- [Inside Fiber: in-depth overview](https://indepth.dev/posts/1008/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react)
 - [React Hooks RFC](https://github.com/reactjs/rfcs/blob/main/text/0068-react-hooks.md)
 
 ---

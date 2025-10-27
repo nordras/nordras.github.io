@@ -1,27 +1,9 @@
 @import "tailwindcss";
 
-/* Ocean Breeze Theme - Color Variables */
+/* Ocean Breeze Theme - Dark Mode Default */
 @layer base {
   :root {
-    /* Light Theme - Ocean Breeze */
-    --color-bg-primary: 255 255 255; /* white */
-    --color-bg-secondary: 248 250 252; /* slate-50 */
-    --color-bg-tertiary: 241 245 249; /* slate-100 */
-    
-    --color-text-primary: 15 23 42; /* slate-900 */
-    --color-text-secondary: 51 65 85; /* slate-700 */
-    --color-text-tertiary: 100 116 139; /* slate-500 */
-    
-    --color-accent-primary: 37 99 235; /* blue-600 */
-    --color-accent-secondary: 14 165 233; /* sky-500 */
-    --color-accent-hover: 29 78 216; /* blue-700 */
-    
-    --color-border: 226 232 240; /* slate-200 */
-    --color-border-hover: 203 213 225; /* slate-300 */
-  }
-  
-  .dark {
-    /* Dark Theme - Ocean Breeze */
+    /* Dark Theme - Ocean Breeze (Padrão) */
     --color-bg-primary: 15 23 42; /* slate-900 */
     --color-bg-secondary: 30 41 59; /* slate-800 */
     --color-bg-tertiary: 51 65 85; /* slate-700 */
@@ -40,7 +22,7 @@
 
   html {
     font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-    color-scheme: light dark;
+    color-scheme: dark;
   }
   
   body {
@@ -68,14 +50,10 @@
   .card {
     background-color: rgb(var(--color-bg-primary));
     border-radius: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
     padding: 1.5rem;
     border: 1px solid rgb(var(--color-border));
     transition: all 0.3s ease;
-  }
-  
-  .dark .card {
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
   }
   
   /* Theme toggle button */
@@ -110,37 +88,31 @@
   .prose h1 { 
     font-size: 2.25rem; 
     margin-top: 0;
-    background: linear-gradient(135deg, rgb(37 99 235), rgb(14 165 233));
+    background: linear-gradient(135deg, rgb(248 250 252), rgb(226 232 240));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-  
-  .dark .prose h1 {
-    background: linear-gradient(135deg, rgb(34 211 238), rgb(56 189 248));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    text-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
   }
   
   .prose h2 { 
     font-size: 1.875rem;
-    color: rgb(var(--color-text-primary));
+    color: rgb(248 250 252); /* slate-50 */
   }
   
   .prose h3 { 
     font-size: 1.5rem;
-    color: rgb(var(--color-text-secondary));
+    color: rgb(226 232 240); /* slate-200 */
   }
   
   .prose h4 { 
     font-size: 1.25rem;
-    color: rgb(var(--color-text-secondary));
+    color: rgb(203 213 225); /* slate-300 */
   }
   
   .prose p {
     margin-bottom: 1.5rem;
-    color: rgb(var(--color-text-secondary));
+    color: rgb(203 213 225); /* slate-300 */
     line-height: 1.8;
   }
   
@@ -151,41 +123,29 @@
   
   .prose li {
     margin-bottom: 0.5rem;
-    color: rgb(var(--color-text-secondary));
+    color: rgb(203 213 225); /* slate-300 */
   }
   
   .prose code {
-    background-color: rgb(241 245 249);
-    color: rgb(220 38 38);
+    background-color: rgb(51 65 85); /* slate-700 */
+    color: rgb(252 165 165); /* red-300 */
     padding: 0.25rem 0.5rem;
     border-radius: 0.375rem;
     font-size: 0.875em;
     font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
     font-weight: 500;
-    border: 1px solid rgb(226 232 240);
-  }
-  
-  .dark .prose code {
-    background-color: rgb(51 65 85);
-    color: rgb(252 165 165);
-    border-color: rgb(71 85 105);
+    border: 1px solid rgb(71 85 105); /* slate-600 */
   }
   
   .prose pre {
-    background-color: rgb(15 23 42);
-    color: rgb(248 250 252);
+    background-color: rgb(2 6 23); /* slate-950 */
+    color: rgb(248 250 252); /* slate-50 */
     padding: 1.5rem;
     border-radius: 0.75rem;
     overflow-x: auto;
     margin: 2rem 0;
-    border: 1px solid rgb(30 41 59);
+    border: 1px solid rgb(15 23 42); /* slate-900 */
     position: relative;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
-  }
-  
-  .dark .prose pre {
-    background-color: rgb(2 6 23);
-    border-color: rgb(15 23 42);
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
   }
   
@@ -274,19 +234,19 @@
   }
   
   .prose blockquote {
-    border-left: 4px solid rgb(var(--color-accent-primary));
+    border-left: 4px solid rgb(34 211 238); /* cyan-400 */
     padding-left: 1.5rem;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     margin: 1.5rem 0;
     font-style: italic;
-    color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-bg-secondary));
+    color: rgb(203 213 225); /* slate-300 */
+    background-color: rgb(30 41 59); /* slate-800 */
     border-radius: 0 0.5rem 0.5rem 0;
   }
   
   .prose a {
-    color: rgb(var(--color-accent-primary));
+    color: rgb(34 211 238); /* cyan-400 */
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 2px;
@@ -294,17 +254,17 @@
   }
   
   .prose a:hover {
-    color: rgb(var(--color-accent-hover));
+    color: rgb(56 189 248); /* sky-400 */
   }
   
   /* Enhanced typography */
   .prose strong {
-    color: rgb(var(--color-text-primary));
+    color: rgb(248 250 252); /* slate-50 */
     font-weight: 700;
   }
   
   .prose em {
-    color: rgb(var(--color-text-secondary));
+    color: rgb(226 232 240); /* slate-200 */
     font-style: italic;
   }
   
