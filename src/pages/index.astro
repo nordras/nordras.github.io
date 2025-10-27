@@ -22,16 +22,17 @@ const posts = allPosts
 	<head>
 		<BaseHead title={t('blog.title')} description={t('meta.description')} lang={lang} />
 	</head>
-	<body class="bg-slate-900 transition-colors duration-300">
+	<body class="bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 transition-colors duration-300">
 		<Header lang={lang} />
 
 		<!-- Hero Section -->
-		<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white transition-colors duration-300">
-			<div class="max-w-blog mx-auto text-center">
-				<h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
+		<section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900 text-white transition-colors duration-300 relative overflow-hidden">
+			<div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse"></div>
+			<div class="max-w-blog mx-auto text-center relative z-10">
+				<h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
 					{t('blog.title')}
 				</h1>
-				<p class="text-xl text-slate-300 max-w-2xl mx-auto">
+				<p class="text-xl text-gray-200 max-w-2xl mx-auto drop-shadow-md">
 					{t('blog.subtitle')}
 				</p>
 			</div>
@@ -41,37 +42,38 @@ const posts = allPosts
 		<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 				{posts.map((post) => (
-					<article class="bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-hidden hover:shadow-xl hover:border-cyan-400 transition-all duration-300">
-						<div class="p-6">
+					<article class="bg-gradient-to-br from-purple-900 to-purple-800 rounded-xl shadow-2xl border border-purple-700 overflow-hidden hover:shadow-blue-500/25 hover:border-blue-500 transition-all duration-300 group relative">
+						<div class="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-purple-600/0 to-pink-600/0 group-hover:from-blue-600/10 group-hover:via-purple-600/10 group-hover:to-pink-600/10 transition-all duration-300"></div>
+						<div class="p-6 relative z-10">
 							<div class="flex items-center justify-between mb-4">
-								<span class="px-3 py-1 bg-slate-700 text-cyan-300 rounded-full text-sm font-medium border border-slate-600">
+								<span class="px-3 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-sm font-medium border border-blue-500 shadow-lg">
 									{post.data.title.includes('JavaScript') ? 'JavaScript' : 
 									 post.data.title.includes('React') ? 'React' : 'Development'}
 								</span>
-								<span class="text-slate-400 text-sm">
+								<span class="text-gray-400 text-sm">
 									{formatDate(post.data.pubDate)}
 								</span>
 							</div>
 							
-							<h2 class="text-xl font-bold text-slate-50 mb-3 hover:text-cyan-400 transition-colors">
+							<h2 class="text-xl font-bold text-white mb-3 hover:text-blue-300 transition-colors group-hover:drop-shadow-lg">
 								<a href={`/blog/${post.id}/`}>
 									{post.data.title}
 								</a>
 							</h2>
 							
 							{post.data.description && (
-								<p class="text-slate-300 mb-4 leading-relaxed">
+								<p class="text-gray-300 mb-4 leading-relaxed">
 									{post.data.description}
 								</p>
 							)}
 							
 							<div class="flex items-center justify-between">
-								<span class="text-slate-400 text-sm">
+								<span class="text-gray-400 text-sm">
 									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
 								</span>
 								<a 
 									href={`/blog/${post.id}/`}
-									class="text-cyan-400 hover:text-cyan-300 font-medium text-sm flex items-center gap-1 group"
+									class="text-blue-400 hover:text-pink-400 font-medium text-sm flex items-center gap-1 group transition-all duration-300"
 								>
 									{t('blog.readMore')} 
 									<span class="group-hover:translate-x-1 transition-transform">→</span>
@@ -84,10 +86,10 @@ const posts = allPosts
 
 			{posts.length === 0 && (
 				<div class="text-center py-16">
-					<h2 class="text-2xl font-bold text-slate-50 mb-4">
+					<h2 class="text-2xl font-bold text-white mb-4">
 						{t('blog.noPosts')}
 					</h2>
-					<p class="text-slate-300">
+					<p class="text-gray-300">
 						{t('blog.noPostsDesc')}
 					</p>
 				</div>
