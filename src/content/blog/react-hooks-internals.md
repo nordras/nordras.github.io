@@ -9,9 +9,9 @@ language: 'pt'
 
 ## Introdução
 
-Se você chegou aqui, é porque quer entender de verdade como o `useState` armazena dados. A resposta está nos internals do React — em especial na árvore **Fiber**. Neste post, mostro como os Hooks funcionam por dentro.
+Se você chegou aqui, deve querer entender hooks em especial o `useState`. E como hoooks funcionam, a resposta está nos internals do React — em especial na árvore **Fiber**. Neste post, mostro como os Hooks funcionam.
 
-React Hooks são apenas funções JavaScript. Quando você escreve:
+React Hooks são apenas funções JavaScript. Nós usamos para atribuir estados de memória, criar efeitos baseados no ciclo de vida de um componente e logo quando escrevemos:
 
 ```jsx
 function MyComponent() {
@@ -26,7 +26,7 @@ Uma **lista ligada de hooks** é criada e um **cursor de posição (ou ponteiro)
 
 ## A Arquitetura: Fibers e Lista Ligada de Hooks
 
-React Hooks fazem uso do **estado oculto** de um componente, que é armazenado dentro de uma **fiber**. Uma fiber é uma entidade que corresponde a uma instância de componente e mantém uma **lista ligada** de todos os hooks utilizados.
+React Hooks fazem uso do **estado oculto** de um componente, estes são armazenados dentro uma **fiber**. Fibers são entidades que correspondem a uma instância de componente e mantém uma **lista ligada** de todos os hooks utilizados.
 
 > **Fiber**: A unidade de trabalho no React que representa um nó na árvore de componentes e mantém informações sobre estado, props, hooks e a estrutura do DOM.
 
@@ -41,5 +41,3 @@ React Hooks fazem uso do **estado oculto** de um componente, que é armazenado d
 - [A deep dive into React Fiber](https://blog.logrocket.com/deep-dive-react-fiber/)
 
 ---
-
-*Este post oferece uma visão aprofundada dos conceitos internos. A implementação real do React inclui otimizações adicionais e casos edge.*
