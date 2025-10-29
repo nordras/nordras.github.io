@@ -2,37 +2,9 @@ import { translations, type Language, type TranslationKey } from './translations
 
 // Mapeamento de posts entre idiomas
 const postMapping: Record<string, Record<Language, string>> = {
-  // React Hooks Guide
-  'react-hooks-guide': {
-    pt: 'react-hooks-guide',
-    en: 'react-hooks-guide-en'
-  },
-  'react-hooks-guide-en': {
-    pt: 'react-hooks-guide',
-    en: 'react-hooks-guide-en'
-  },
-  // O que é React / What is React
-  'o-que-e-react': {
-    pt: 'o-que-e-react',
-    en: 'what-is-react'
-  },
-  'what-is-react': {
-    pt: 'o-que-e-react',
-    en: 'what-is-react'
-  },
-  // React Hooks Internals
-  'react-hooks-internals': {
-    pt: 'react-hooks-internals',
-    en: 'react-hooks-internals-en'
-  },
-  'react-hooks-internals-en': {
-    pt: 'react-hooks-internals',
-    en: 'react-hooks-internals-en'
-  },
-  // Posts sem tradução (redirecionam para home)
   'using-mdx': {
     pt: 'using-mdx',
-    en: '' // Redireciona para home em inglês
+    en: 'using-mdx' // Redireciona para home em inglês
   }
 };
 

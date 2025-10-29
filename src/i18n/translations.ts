@@ -2,8 +2,8 @@ export const translations = {
   pt: {
     'nav.blog': 'Blog',
     'nav.about': 'Sobre',
-    'blog.title': 'DevBlog',
-    'blog.subtitle': 'Artigos sobre desenvolvimento web',
+    'blog.title': 'Igor\'s Dev Blog',
+    'blog.subtitle': 'Artigos, tutoriais e dossiers sobre tecnologias de desenvolvimento web.',
     'blog.readMore': 'Ler mais',
     'blog.backToBlog': 'Voltar ao Blog',
     'blog.publishedOn': 'Publicado em',
@@ -20,7 +20,7 @@ export const translations = {
   en: {
     'nav.blog': 'Blog',
     'nav.about': 'About',
-    'blog.title': 'DevBlog',
+    'blog.title': 'Igor\'s Dev Blog',
     'blog.subtitle': 'Articles about web development',
     'blog.readMore': 'Read more',
     'blog.backToBlog': 'Back to Blog',
