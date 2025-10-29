@@ -6,7 +6,6 @@ import BlogPost from '../../../layouts/BlogPost.astro';
 export const getStaticPaths: GetStaticPaths = async () => {
 	const posts = await getCollection('blog');
 	
-	// Filter posts in English for /en routes
 	const englishPosts = posts.filter(post => post.data.language === 'en');
 	
 	return englishPosts.map((post) => ({

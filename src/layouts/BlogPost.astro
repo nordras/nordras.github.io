@@ -12,7 +12,6 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage, language } = Astro.props;
 const t = useTranslations(language);
 
-// Determine the correct home link based on language
 const homeLink = language === 'en' ? '/en/' : '/';
 const backText = language === 'en' ? 'Back to Blog' : 'Voltar ao Blog';
 const updatedText = language === 'en' ? 'Updated on' : 'Atualizado em';
@@ -25,7 +24,7 @@ const updatedText = language === 'en' ? 'Updated on' : 'Atualizado em';
 
 	<body class="bg-zinc-900 transition-colors duration-300">
 		<Header lang={language} />
-		<main class="max-w-blog mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<main class="max-w-blog mx-auto py-8">
 			<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden">
 				{heroImage && (
 					<div class="w-full h-64 md:h-80 overflow-hidden">

@@ -1,10 +1,9 @@
 import { translations, type Language, type TranslationKey } from './translations';
 
-// Mapeamento de posts entre idiomas
 const postMapping: Record<string, Record<Language, string>> = {
   'using-mdx': {
     pt: 'using-mdx',
-    en: 'using-mdx' // Redireciona para home em inglês
+    en: 'using-mdx-en'
   }
 };
 
@@ -21,27 +20,31 @@ export function getLangFromUrl(url: URL): Language {
 }
 
 export function getLocalizedUrl(url: string, targetLang: Language, currentLang: Language): string {
-  // Remove o idioma atual da URL se existir
   let cleanUrl = url;
+  
   if (currentLang !== 'pt') {
-    cleanUrl = url.replace(`/${currentLang}`, '');
+    const langPrefix = `/${currentLang}`;
+    if (cleanUrl.startsWith(langPrefix)) {
+      cleanUrl = cleanUrl.substring(langPrefix.length) || '/';
+    }
   }
   
-  // Para posts de blog, tentar encontrar o post correspondente no outro idioma
+  if (!cleanUrl.startsWith('/')) {
+    cleanUrl = '/' + cleanUrl;
+  }
+  
   const blogPostMatch = cleanUrl.match(/^\/blog\/([^\/]+)\/?$/);
   if (blogPostMatch) {
     const currentPostId = blogPostMatch[1];
     const mappedPostId = postMapping[currentPostId]?.[targetLang];
     
     if (mappedPostId && mappedPostId !== '') {
-      // Post correspondente encontrado
       if (targetLang === 'pt') {
         return `/blog/${mappedPostId}/`;
       } else {
         return `/${targetLang}/blog/${mappedPostId}/`;
       }
     } else {
-      // Post não existe no outro idioma, redirecionar para home
       if (targetLang === 'pt') {
         return '/';
       } else {
@@ -50,7 +53,6 @@ export function getLocalizedUrl(url: string, targetLang: Language, currentLang: 
     }
   }
   
-  // Para outras páginas, aplicar a lógica normal
   if (targetLang === 'pt') {
     return cleanUrl;
   }
