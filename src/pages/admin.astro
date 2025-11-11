@@ -1,0 +1,93 @@
+---
+import { getDraftPosts, getPostsStatistics } from '../utils/posts';
+import BaseHead from '../components/BaseHead.astro';
+
+// Esta página só deve existir em desenvolvimento
+if (import.meta.env.PROD) {
+	return Astro.redirect('/');
+}
+
+const drafts = await getDraftPosts();
+const stats = await getPostsStatistics();
+---
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<BaseHead title="Admin - Posts em Draft" description="Página administrativa para visualizar posts em desenvolvimento" lang="pt" />
+</head>
+<body class="bg-zinc-900 text-white min-h-screen p-8">
+	<div class="max-w-4xl mx-auto">
+		<h1 class="text-3xl font-bold mb-8 text-cyan-400">Administração - Posts</h1>
+		
+		<!-- Estatísticas -->
+		<div class="bg-zinc-800 rounded-lg p-6 mb-8">
+			<h2 class="text-xl font-semibold mb-4">Estatísticas</h2>
+			<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+				<div class="bg-zinc-700 p-4 rounded">
+					<div class="text-2xl font-bold text-green-400">{stats.published}</div>
+					<div class="text-sm text-zinc-300">Publicados</div>
+				</div>
+				<div class="bg-zinc-700 p-4 rounded">
+					<div class="text-2xl font-bold text-yellow-400">{stats.drafts}</div>
+					<div class="text-sm text-zinc-300">Drafts</div>
+				</div>
+				<div class="bg-zinc-700 p-4 rounded">
+					<div class="text-2xl font-bold text-blue-400">{stats.byLanguage.pt.total}</div>
+					<div class="text-sm text-zinc-300">Português</div>
+				</div>
+				<div class="bg-zinc-700 p-4 rounded">
+					<div class="text-2xl font-bold text-purple-400">{stats.byLanguage.en.total}</div>
+					<div class="text-sm text-zinc-300">Inglês</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Posts em Draft -->
+		<div class="bg-zinc-800 rounded-lg p-6">
+			<h2 class="text-xl font-semibold mb-4">Posts em Draft ({drafts.length})</h2>
+			
+			{drafts.length === 0 ? (
+				<p class="text-zinc-400">Nenhum post em draft no momento.</p>
+			) : (
+				<div class="space-y-4">
+					{drafts.map((post) => (
+						<div class="bg-zinc-700 rounded-lg p-4 border-l-4 border-yellow-400">
+							<div class="flex justify-between items-start mb-2">
+								<h3 class="text-lg font-semibold text-white">{post.data.title}</h3>
+								<span class="px-2 py-1 bg-zinc-600 rounded text-xs text-zinc-300">
+									{post.data.language.toUpperCase()}
+								</span>
+							</div>
+							<p class="text-zinc-300 mb-3">{post.data.description}</p>
+							<div class="flex justify-between items-center text-sm text-zinc-400">
+								<span>ID: {post.id}</span>
+								<span>Data: {post.data.pubDate.toLocaleDateString('pt-BR')}</span>
+							</div>
+							<div class="mt-3 flex space-x-2">
+								<span class="px-2 py-1 bg-yellow-600 text-yellow-100 rounded text-xs">
+									DRAFT
+								</span>
+								{post.data.tags && post.data.tags.map(tag => (
+									<span class="px-2 py-1 bg-zinc-600 text-zinc-200 rounded text-xs">
+										{tag}
+									</span>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+			)}
+		</div>
+
+		<div class="mt-8 text-center">
+			<a 
+				href="/" 
+				class="inline-block bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded-lg transition-colors"
+			>
+				Voltar ao Blog
+			</a>
+		</div>
+	</div>
+</body>
+</html>

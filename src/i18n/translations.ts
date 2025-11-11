@@ -1,0 +1,41 @@
+export const translations = {
+  pt: {
+    'nav.blog': 'Blog',
+    'nav.about': 'Sobre',
+    'blog.title': 'Igor\'s Dev Blog',
+    'blog.subtitle': 'Artigos, tutoriais e dossiers sobre tecnologias de desenvolvimento web.',
+    'blog.readMore': 'Ler mais',
+    'blog.backToBlog': 'Voltar ao Blog',
+    'blog.publishedOn': 'Publicado em',
+    'blog.readingTime': 'min de leitura',
+    'blog.noPosts': 'Nenhum post encontrado',
+    'blog.noPostsDesc': 'Em breve teremos mais conteúdo por aqui!',
+    'theme.toggle': 'Alternar tema',
+    'theme.dark': 'Modo escuro',
+    'theme.light': 'Modo claro',
+    'meta.description': 'Blog sobre desenvolvimento web, JavaScript, React e tecnologias modernas',
+    'footer.rights': 'Todos os direitos reservados',
+    'footer.description': 'Conteúdo de qualidade sobre desenvolvimento web, com foco em JavaScript, React e tecnologias modernas.',
+  },
+  en: {
+    'nav.blog': 'Blog',
+    'nav.about': 'About',
+    'blog.title': 'Igor\'s Dev Blog',
+    'blog.subtitle': 'Articles about web development',
+    'blog.readMore': 'Read more',
+    'blog.backToBlog': 'Back to Blog',
+    'blog.publishedOn': 'Published on',
+    'blog.readingTime': 'min read',
+    'blog.noPosts': 'No posts found',
+    'blog.noPostsDesc': 'More content coming soon!',
+    'theme.toggle': 'Toggle theme',
+    'theme.dark': 'Dark mode',
+    'theme.light': 'Light mode',
+    'meta.description': 'Blog about web development, JavaScript, React and modern technologies',
+    'footer.rights': 'All rights reserved',
+    'footer.description': 'Quality content about web development, focusing on JavaScript, React and modern technologies.',
+  },
+} as const;
+
+export type Language = keyof typeof translations;
+export type TranslationKey = keyof typeof translations.pt;

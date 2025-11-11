@@ -1,0 +1,78 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { useTranslations } from '../i18n/utils';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, description, pubDate, updatedDate, heroImage, language } = Astro.props;
+const t = useTranslations(language);
+
+const homeLink = language === 'en' ? '/en/' : '/';
+const backText = language === 'en' ? 'Back to Blog' : 'Voltar ao Blog';
+const updatedText = language === 'en' ? 'Updated on' : 'Atualizado em';
+---
+
+<html lang={language}>
+	<head>
+		<BaseHead title={title} description={description} lang={language} />
+	</head>
+
+	<body class="bg-zinc-900 transition-colors duration-300">
+		<Header lang={language} />
+		<main class="max-w-blog mx-auto py-8">
+			<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden">
+				{heroImage && (
+					<div class="w-full h-64 md:h-80 overflow-hidden">
+						<Image 
+							width={1020} 
+							height={510} 
+							src={heroImage} 
+							alt="" 
+							class="w-full h-full object-cover"
+						/>
+					</div>
+				)}
+				
+				<div class="p-8">
+					<header class="mb-8 text-center border-b border-zinc-700 pb-8">
+						<div class="mb-4 text-zinc-400">
+							<FormattedDate date={pubDate} />
+							{updatedDate && (
+								<div class="text-sm italic mt-1">
+									{updatedText} <FormattedDate date={updatedDate} />
+								</div>
+							)}
+						</div>
+						<h1 class="text-3xl md:text-4xl font-bold text-zinc-50 mb-4">
+							{title}
+						</h1>
+						{description && (
+							<p class="text-lg text-zinc-300 leading-relaxed">
+								{description}
+							</p>
+						)}
+					</header>
+					
+					<div class="prose prose-lg max-w-none">
+						<slot />
+					</div>
+				</div>
+			</article>
+			
+			<div class="mt-8 text-center">
+				<a 
+					href={homeLink} 
+					class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-indigo-500/25"
+				>
+					<span>←</span> {backText}
+				</a>
+			</div>
+		</main>
+		<Footer lang={language} />
+	</body>
+</html>

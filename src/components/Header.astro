@@ -1,0 +1,29 @@
+---
+import { SITE_TITLE } from '../consts';
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+import LanguageSelector from './LanguageSelector.astro';
+import type { Language } from '../i18n/translations';
+
+interface Props {
+	lang?: Language;
+}
+
+const { lang = getLangFromUrl(Astro.url) } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<header class="bg-slate-900 border-b border-slate-800 shadow-sm transition-colors duration-200">
+	<nav class="max-w-blog mx-auto py-4 flex items-center justify-between">
+		<h2 class="text-xl font-bold">
+			<a href={lang === 'pt' ? '/' : `/${lang}`} class="text-slate-50 hover:text-cyan-400 transition-colors">
+				{t('blog.title')}
+			</a>
+		</h2>
+		
+		<div class="flex items-center space-x-4">
+			<LanguageSelector currentLang={lang} />
+		</div>
+	</nav>
+</header>
+
+

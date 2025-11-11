@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '@components/BaseHead.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import { useTranslations, getDateFormatter } from '@/i18n/utils';
+import { getPublishedPostsForLanguage } from '@/utils/posts';
+
+const lang = 'en';
+const t = useTranslations(lang);
+const formatDate = getDateFormatter(lang);
+
+// Obter apenas posts publicados em inglês
+const posts = await getPublishedPostsForLanguage('en');
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={t('blog.title')} description={t('meta.description')} lang={lang} />
+	</head>
+	<body class="bg-zinc-900 transition-colors duration-300">
+		<Header lang={lang} />
+		<!-- Posts Grid -->
+		<main class="max-w-blog mx-auto py-8">
+			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+				{posts.map((post) => (
+					<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden hover:shadow-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 group relative">
+						<div class="absolute inset-0 bg-gradient-to-r from-indigo-600/0 via-purple-600/0 to-green-600/0 group-hover:from-indigo-600/5 group-hover:via-purple-600/5 group-hover:to-green-600/5 transition-all duration-300"></div>
+						<div class="p-6 relative z-10">
+							<div class="flex items-center justify-between mb-4">
+								<span class="px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full text-sm font-medium border border-indigo-500/50 shadow-lg">
+									{post.data.title.includes('JavaScript') ? 'JavaScript' : 
+									 post.data.title.includes('React') ? 'React' : 'Development'}
+								</span>
+								<span class="text-zinc-400 text-sm">
+									{formatDate(post.data.pubDate)}
+								</span>
+							</div>
+							
+							<h2 class="text-xl font-bold text-zinc-50 mb-3 hover:text-indigo-300 transition-colors group-hover:drop-shadow-lg">
+								<a href={`/blog/${post.id}/`}>
+									{post.data.title}
+								</a>
+							</h2>
+							
+							{post.data.description && (
+								<p class="text-zinc-300 mb-4 leading-relaxed">
+									{post.data.description}
+								</p>
+							)}
+							
+							<div class="flex items-center justify-between">
+								<span class="text-zinc-400 text-sm">
+									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
+								</span>
+								<a 
+									href={`/blog/${post.id}/`}
+									class="text-indigo-400 hover:text-green-400 font-medium text-sm flex items-center gap-1 group transition-all duration-300"
+								>
+									{t('blog.readMore')} 
+									<span class="group-hover:translate-x-1 transition-transform">→</span>
+								</a>
+							</div>
+						</div>
+					</article>
+				))}
+			</div>
+
+			{posts.length === 0 && (
+				<div class="text-center py-16">
+					<h2 class="text-2xl font-bold text-zinc-50 mb-4">
+						{t('blog.noPosts')}
+					</h2>
+					<p class="text-zinc-300">
+						{t('blog.noPostsDesc')}
+					</p>
+				</div>
+			)}
+		</main>
+
+		<Footer lang={lang} />
+	</body>
+</html>

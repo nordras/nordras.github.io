@@ -1,0 +1,31 @@
+---
+title: 'Usando MDX'
+description: 'Como usar MDX no Astro para criar conteúdo interativo'
+pubDate: 'Jun 01 2024'
+language: 'pt'
+status: 'published'
+---
+
+Este tema vem com a integração [@astrojs/mdx](https://docs.astro.build/en/guides/integrations-guide/mdx/) instalada e configurada no seu arquivo `astro.config.mjs`. Se você preferir não usar MDX, pode desabilitar o suporte removendo a integração do seu arquivo de configuração.
+
+## Por que MDX?
+
+MDX é um tipo especial de Markdown que suporta sintaxe JavaScript e JSX incorporada. Isso permite [misturar JavaScript e Componentes de UI no seu conteúdo Markdown](https://docs.astro.build/en/guides/markdown-content/#mdx-features) para coisas como gráficos interativos ou alertas.
+
+Se você tem conteúdo existente escrito em MDX, esta integração deve facilitar a migração para o Astro.
+
+## Exemplo
+
+Aqui está como você pode usar recursos MDX nas suas postagens do blog. MDX permite usar componentes diretamente no seu markdown.
+
+**Exemplo de Botão Interativo:**
+
+<button onclick="alert('Olá do MDX!')">
+	Clique em mim - Componente incorporado no MDX
+</button>
+
+## Mais Links
+
+- [Documentação de Sintaxe MDX](https://mdxjs.com/docs/what-is-mdx)
+- [Documentação de Uso do Astro](https://docs.astro.build/en/guides/markdown-content/#markdown-and-mdx-pages)
+- **Nota:** [Diretivas de Cliente](https://docs.astro.build/en/reference/directives-reference/#client-directives) ainda são necessárias para criar componentes interativos. Caso contrário, todos os componentes no seu MDX serão renderizados como HTML estático (sem JavaScript) por padrão.

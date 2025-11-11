@@ -1,0 +1,27 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry, render } from 'astro:content';
+import BlogPost from '../../../layouts/BlogPost.astro';
+import { getPublishedPostsForLanguage } from '../../../utils/posts';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+	// Gerar páginas apenas para posts publicados em inglês
+	const englishPosts = await getPublishedPostsForLanguage('en');
+	
+	return englishPosts.map((post) => ({
+		params: { id: post.id },
+		props: { post },
+	}));
+};
+
+type Props = {
+	post: CollectionEntry<'blog'>;
+};
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogPost {...post.data}>
+	<Content />
+</BlogPost>

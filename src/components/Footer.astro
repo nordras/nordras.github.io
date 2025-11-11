@@ -1,0 +1,47 @@
+---
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+import type { Language } from '../i18n/translations';
+
+interface Props {
+	lang?: Language;
+}
+
+const { lang = getLangFromUrl(Astro.url) } = Astro.props;
+const t = useTranslations(lang);
+const today = new Date();
+---
+
+<footer class="bg-slate-950 text-slate-300 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300 border-t border-slate-900">
+	<div class="max-w-7xl mx-auto text-center">
+		<!-- <h3 class="text-xl font-bold mb-4">
+			{t('blog.title')}<span class="text-cyan-400">Blog</span>
+		</h3>
+		<p class="text-slate-400 mb-4 max-w-2xl mx-auto">
+			{t('footer.description')}
+		</p> -->
+		<div class="border-t border-slate-800 mt-6 pt-6">
+			<p class="text-slate-400">&copy; {today.getFullYear()} {t('blog.title')}. {t('footer.rights')}.</p>
+		</div>
+	</div>
+</footer>
+<style>
+	footer {
+		padding: 2em 1em 6em 1em;
+		background: linear-gradient(var(--gray-gradient)) no-repeat;
+		color: rgb(var(--gray));
+		text-align: center;
+	}
+	.social-links {
+		display: flex;
+		justify-content: center;
+		gap: 1em;
+		margin-top: 1em;
+	}
+	.social-links a {
+		text-decoration: none;
+		color: rgb(var(--gray));
+	}
+	.social-links a:hover {
+		color: rgb(var(--gray-dark));
+	}
+</style>

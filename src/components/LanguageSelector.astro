@@ -1,0 +1,76 @@
+---
+import { getLangFromUrl, getLocalizedUrl } from '@/i18n/utils';
+import type { Language } from '@/i18n/translations';
+import BrazilFlag from '@components/icons/BrazilFlag.astro';
+import USFlag from '@components/icons/USFlag.astro';
+
+interface Props {
+	currentLang: Language;
+}
+
+const { currentLang } = Astro.props;
+const currentUrl = Astro.url.pathname;
+
+const languages = [
+	{ code: 'pt', name: 'Português' },
+	{ code: 'en', name: 'English' },
+] as const;
+
+const isOnBlogPost = currentUrl.includes('/blog/');
+
+---
+
+<div class="flex items-center space-x-2">
+	{languages.map((lang) => {
+		const url = getLocalizedUrl(currentUrl, lang.code as Language, currentLang);
+		const isActive = lang.code === currentLang;
+		
+		return (
+			<button 
+				class={`p-2 rounded-lg transition-all duration-200 hover:bg-slate-800 ${
+					isActive ? 'bg-slate-800 ring-2 ring-cyan-400' : 'opacity-70 hover:opacity-100'
+				}`}
+				data-lang={lang.code}
+				data-url={url}
+				data-is-blog-post={isOnBlogPost}
+				title={lang.name}
+			>
+				{lang.code === 'pt' ? (
+					<BrazilFlag />
+				) : (
+					<USFlag />
+				)}
+			</button>
+		);
+	})}
+</div>
+
+<script>
+	const buttons = document.querySelectorAll('[data-lang]');
+	
+	buttons.forEach(button => {
+		button.addEventListener('click', (e) => {
+			const target = e.currentTarget as HTMLButtonElement;
+			const selectedLang = target.dataset.lang!;
+			const currentLang = target.closest('div')?.querySelector('.ring-2')?.getAttribute('data-lang');
+			
+			if (selectedLang === currentLang) {
+				return;
+			}
+			
+			const selectedUrl = target.dataset.url!;
+			const isBlogPost = target.dataset.isBlogPost === 'true';
+			
+			const isGoingToHome = selectedUrl === '/' || selectedUrl === '/en/';
+			
+			if (isGoingToHome && isBlogPost) {
+				const confirmed = confirm('Este post não está disponível no idioma selecionado. Deseja ir para a página inicial?');
+				if (confirmed) {
+					window.location.href = selectedUrl;
+				}
+			} else {
+				window.location.href = selectedUrl;
+			}
+		});
+	});
+</script>
