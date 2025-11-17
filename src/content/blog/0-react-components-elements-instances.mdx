@@ -1,0 +1,151 @@
+---
+title: 'Understanding react step 0 - Components, Elements and Instances'
+description: ''
+pubDate: 'Nov 10 2025'
+language: 'pt'
+status: 'published'
+tags: ['React', 'JavaScript', 'Frontend', 'Fundamentals']
+---
+
+# React Components, Elements and Instances
+
+A meta deste blog e pots subseuqnetes é introduzir ao react, fomentar conhecimento, fixar idéias, conceitos e fundamentos sobre tecnologias, para isto abordarei os temas do básico ao avançado, 
+tentarei ser minucioso. Desde já expresso minha gratidão aos leitores.
+Então amos ao React temos que entender seu funcionamento e arquitetura.
+
+## Definição e História
+React é uma lib javascript feita pelo Facebook (meta) em meados de 2013 e desde então foi se popularizando e reduzindo o uso de jQuery (2006). Na era jQuery, este veio com a proposta de facilitar a manipulação
+do DOM, para isto ele ainda provê queries para acessar diretamente o DOM. Isto era melhor do que usar diretamente seletores document.getElementById, getElementByClassName e outros. Ao longo dos anos jQuery foi 
+se tornando pesado e complexo devido a escala e complexidade dos projetos web, bibliotecas como React, Vue, Angular e experimentos como hell.js começaram a surgir e serem adotadas gradativamente.
+React se tornou popular e hoje é uma das biblioteca mais usadas.
+
+
+
+## Princípio
+Componentes, Elementos e Instâncias são conceitos fundamentais para compreenção de como o React opera.
+
+
+
+## Conceitos
+
+### Evolução dos Seletores DOM
+
+Para entender melhor o valor que React traz, vamos comparar como a mesma funcionalidade evoluiu ao longo do tempo:
+
+<div style="overflow-x: auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>JavaScript Vanilla</th>
+        <th>jQuery</th>
+        <th>React</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+
+```javascript
+// Selecionando elementos
+const button = document.getElementById('myButton');
+const items = document.getElementsByClassName('item');
+const links = document.querySelectorAll('a.external');
+
+// Manipulando DOM
+button.addEventListener('click', function() {
+  const newDiv = document.createElement('div');
+  newDiv.className = 'message';
+  newDiv.textContent = 'Clicou!';
+  document.body.appendChild(newDiv);
+});
+
+// Atualizando lista
+const list = document.getElementById('todoList');
+list.innerHTML = '';
+todos.forEach(function(todo) {
+  const li = document.createElement('li');
+  li.textContent = todo.text;
+  if (todo.completed) {
+    li.className = 'completed';
+  }
+  list.appendChild(li);
+});
+```
+
+</td>
+<td>
+
+```javascript
+// Selecionando elementos
+const $button = $('#myButton');
+const $items = $('.item');
+const $links = $('a.external');
+
+// Manipulando DOM
+$button.on('click', function() {
+  $('<div>')
+    .addClass('message')
+    .text('Clicou!')
+    .appendTo('body');
+});
+
+// Atualizando lista
+const $list = $('#todoList');
+$list.empty();
+$.each(todos, function(index, todo) {
+  $('<li>')
+    .text(todo.text)
+    .toggleClass('completed', todo.completed)
+    .appendTo($list);
+});
+```
+
+</td>
+<td>
+
+```jsx
+// Componente React
+function TodoList({ todos }) {
+  const [message, setMessage] = useState('');
+
+  const handleClick = () => {
+    setMessage('Clicou!');
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick}>
+        Clique aqui
+      </button>
+      
+      {message && <div className="message">{message}</div>}
+      
+      <ul>
+        {todos.map(todo => (
+          <li 
+            key={todo.id}
+            className={todo.completed ? 'completed' : ''}
+          >
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+**Principais diferenças:**
+
+1. **JavaScript Vanilla**: Verboso, manipulação direta do DOM, imperativo
+2. **jQuery**: Sintaxe mais limpa, API unificada, ainda imperativo
+3. **React**: Declarativo, state management, virtual DOM, componentes reutilizáveis
+
+## Fontes
+

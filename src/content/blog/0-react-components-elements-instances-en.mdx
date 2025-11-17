@@ -1,0 +1,136 @@
+---
+title: 'Understanding react step 0 - Components, Elements and Instances'
+description: ''
+pubDate: 'Nov 10 2025'
+language: 'en'
+status: 'published'
+tags: ['React', 'JavaScript', 'Frontend', 'Fundamentals']
+---
+
+# React Components, Elements and Instances
+
+
+## Principio
+
+## Conceitos
+
+### Evolution of DOM Selectors
+
+To better understand the value React brings, let's compare how the same functionality evolved over time:
+
+<div style="overflow-x: auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Vanilla JavaScript</th>
+        <th>jQuery</th>
+        <th>React</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+
+```javascript
+// Selecting elements
+const button = document.getElementById('myButton');
+const items = document.getElementsByClassName('item');
+const links = document.querySelectorAll('a.external');
+
+// Manipulating DOM
+button.addEventListener('click', function() {
+  const newDiv = document.createElement('div');
+  newDiv.className = 'message';
+  newDiv.textContent = 'Clicked!';
+  document.body.appendChild(newDiv);
+});
+
+// Updating list
+const list = document.getElementById('todoList');
+list.innerHTML = '';
+todos.forEach(function(todo) {
+  const li = document.createElement('li');
+  li.textContent = todo.text;
+  if (todo.completed) {
+    li.className = 'completed';
+  }
+  list.appendChild(li);
+});
+```
+
+</td>
+<td>
+
+```javascript
+// Selecting elements
+const $button = $('#myButton');
+const $items = $('.item');
+const $links = $('a.external');
+
+// Manipulating DOM
+$button.on('click', function() {
+  $('<div>')
+    .addClass('message')
+    .text('Clicked!')
+    .appendTo('body');
+});
+
+// Updating list
+const $list = $('#todoList');
+$list.empty();
+$.each(todos, function(index, todo) {
+  $('<li>')
+    .text(todo.text)
+    .toggleClass('completed', todo.completed)
+    .appendTo($list);
+});
+```
+
+</td>
+<td>
+
+```jsx
+// React Component
+function TodoList({ todos }) {
+  const [message, setMessage] = useState('');
+
+  const handleClick = () => {
+    setMessage('Clicked!');
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick}>
+        Click here
+      </button>
+      
+      {message && <div className="message">{message}</div>}
+      
+      <ul>
+        {todos.map(todo => (
+          <li 
+            key={todo.id}
+            className={todo.completed ? 'completed' : ''}
+          >
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+**Key differences:**
+
+1. **Vanilla JavaScript**: Verbose, direct DOM manipulation, imperative
+2. **jQuery**: Cleaner syntax, unified API, still imperative
+3. **React**: Declarative, state management, virtual DOM, reusable components
+
+## 
