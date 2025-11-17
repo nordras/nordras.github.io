@@ -1,0 +1,25 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const isDev = import.meta.env.DEV;
+
+if (!isDev) {
+  return Astro.redirect('/');
+}
+---
+
+<!doctype html>
+<html lang="pt">
+  <head>
+    <BaseHead title="Sandbox - Dev Only" description="Área de testes e desenvolvimento" />
+  </head>
+  <body>
+    <Header lang="pt" />
+    <main class="max-w-4xl mx-auto px-4 py-8">
+      
+    </main>
+    <Footer />
+  </body>
+</html>

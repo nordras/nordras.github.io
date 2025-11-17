@@ -10,6 +10,7 @@ interface Props {
 
 const { lang = getLangFromUrl(Astro.url) } = Astro.props;
 const t = useTranslations(lang);
+const isDev = import.meta.env.DEV;
 ---
 
 <header class="bg-slate-900 border-b border-slate-800 shadow-sm transition-colors duration-200">
@@ -21,6 +22,15 @@ const t = useTranslations(lang);
 		</h2>
 		
 		<div class="flex items-center space-x-4">
+			{isDev && (
+				<a 
+					href="/sandbox" 
+					class="px-3 py-1 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+					title="Sandbox - Dev Only"
+				>
+					🛠️ Sandbox
+				</a>
+			)}
 			<LanguageSelector currentLang={lang} />
 		</div>
 	</nav>
