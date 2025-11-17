@@ -1,0 +1,117 @@
+---
+interface Tab {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  tabs: Tab[];
+}
+
+const { tabs } = Astro.props;
+const uniqueId = `tabs-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="tabs-container" data-tabs-id={uniqueId}>
+  <div class="tabs-header">
+    {tabs.map((tab, index) => (
+      <button
+        class={`tab-button ${index === 0 ? 'active' : ''}`}
+        data-tab={tab.id}
+        type="button"
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+  
+  <div class="tabs-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .tabs-container {
+    margin: 1.5rem 0;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #1e1e1e;
+  }
+
+  .tabs-header {
+    display: flex;
+    gap: 0.25rem;
+    background: #2d2d2d;
+    padding: 0.5rem;
+    border-bottom: 2px solid #374151;
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .tab-button:hover {
+    color: #e5e7eb;
+    background: #374151;
+  }
+
+  .tab-button.active {
+    color: #60a5fa;
+    background: #1e40af20;
+    font-weight: 600;
+  }
+
+  .tabs-content {
+    padding: 16px;
+  }
+
+  .tabs-content :global([data-tab-content]) {
+    display: none;
+  }
+
+  .tabs-content :global([data-tab-content].active) {
+    display: block;
+  }
+</style>
+
+<script>
+  function initTabs() {
+    document.querySelectorAll('.tabs-container').forEach(container => {
+      const buttons = container.querySelectorAll('.tab-button');
+      const contents = container.querySelectorAll('[data-tab-content]');
+      
+      if (contents.length > 0) {
+        contents[0].classList.add('active');
+      }
+      
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const tabId = button.getAttribute('data-tab');
+          
+          buttons.forEach(btn => btn.classList.remove('active'));
+          contents.forEach(content => content.classList.remove('active'));
+          
+          button.classList.add('active');
+          
+          const targetContent = container.querySelector(`[data-tab-content="${tabId}"]`);
+          if (targetContent) {
+            targetContent.classList.add('active');
+          }
+        });
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initTabs);
+  document.addEventListener('astro:page-load', initTabs);
+</script>

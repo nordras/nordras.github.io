@@ -7,6 +7,8 @@ status: 'published'
 tags: ['React', 'JavaScript', 'Frontend', 'Fundamentals']
 ---
 
+import Tabs from '../../components/Tabs.astro';
+
 # React Components, Elements and Instances
 
 A meta deste blog e pots subseuqnetes é introduzir ao react, fomentar conhecimento, fixar idéias, conceitos e fundamentos sobre tecnologias, para isto abordarei os temas do básico ao avançado, 
@@ -32,20 +34,15 @@ Componentes, Elementos e Instâncias são conceitos fundamentais para compreenç
 
 Para entender melhor o valor que React traz, vamos comparar como a mesma funcionalidade evoluiu ao longo do tempo:
 
-<div style="overflow-x: auto;">
-  <table>
-    <thead>
-      <tr>
-        <th>JavaScript Vanilla</th>
-        <th>jQuery</th>
-        <th>React</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
+<Tabs tabs={[
+  { id: 'vanilla', label: 'JavaScript Vanilla' },
+  { id: 'jquery', label: 'jQuery' },
+  { id: 'react', label: 'React' }
+]}>
+  <div data-tab-content="vanilla">
 
 ```javascript
+
 // Selecionando elementos
 const button = document.getElementById('myButton');
 const items = document.getElementsByClassName('item');
@@ -72,10 +69,12 @@ todos.forEach(function(todo) {
 });
 ```
 
-</td>
-<td>
+  </div>
+  
+  <div data-tab-content="jquery">
 
 ```javascript
+
 // Selecionando elementos
 const $button = $('#myButton');
 const $items = $('.item');
@@ -100,10 +99,12 @@ $.each(todos, function(index, todo) {
 });
 ```
 
-</td>
-<td>
+  </div>
+  
+  <div data-tab-content="react">
 
 ```jsx
+
 // Componente React
 function TodoList({ todos }) {
   const [message, setMessage] = useState('');
@@ -135,11 +136,8 @@ function TodoList({ todos }) {
 }
 ```
 
-</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  </div>
+</Tabs>
 
 **Principais diferenças:**
 

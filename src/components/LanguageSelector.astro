@@ -28,11 +28,12 @@ const isOnBlogPost = currentUrl.includes('/blog/');
 		return (
 			<button 
 				class={`p-2 rounded-lg transition-all duration-200 hover:bg-slate-800 ${
-					isActive ? 'bg-slate-800 ring-2 ring-cyan-400' : 'opacity-70 hover:opacity-100'
+					isActive ? 'bg-slate-800' : 'opacity-70 hover:opacity-100'
 				}`}
 				data-lang={lang.code}
 				data-url={url}
 				data-is-blog-post={isOnBlogPost}
+				data-is-active={isActive}
 				title={lang.name}
 			>
 				{lang.code === 'pt' ? (
@@ -52,11 +53,20 @@ const isOnBlogPost = currentUrl.includes('/blog/');
 		button.addEventListener('click', (e) => {
 			const target = e.currentTarget as HTMLButtonElement;
 			const selectedLang = target.dataset.lang!;
-			const currentLang = target.closest('div')?.querySelector('.ring-2')?.getAttribute('data-lang');
+			const activeButton = target.closest('div')?.querySelector('[data-is-active="true"]') as HTMLButtonElement;
+			const currentLang = activeButton?.dataset.lang;
 			
 			if (selectedLang === currentLang) {
 				return;
 			}
+			
+			// Adiciona o ring ao botão clicado
+			target.classList.add('ring-2', 'ring-cyan-400');
+			
+			// Remove o ring após 0.8s
+			setTimeout(() => {
+				target.classList.remove('ring-2', 'ring-cyan-400');
+			}, 800);
 			
 			const selectedUrl = target.dataset.url!;
 			const isBlogPost = target.dataset.isBlogPost === 'true';
