@@ -25,6 +25,20 @@ export function getPublishedPostsByLanguage(
 }
 
 /**
+ * Filtra posts por idioma, incluindo unpublished em modo dev
+ */
+export function getPostsByLanguage(
+	posts: BlogPost[],
+	language: Language,
+	includeUnpublished: boolean = false
+): BlogPost[] {
+	return posts
+		.filter(post => post.data.language === language)
+		.filter(post => includeUnpublished || post.data.status === POST_STATUS.PUBLISHED)
+		.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+}
+
+/**
  * Obtém todos os posts publicados
  */
 export async function getPublishedPosts(): Promise<BlogPost[]> {
@@ -38,6 +52,14 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
 export async function getPublishedPostsForLanguage(language: Language): Promise<BlogPost[]> {
 	const allPosts = await getCollection('blog');
 	return getPublishedPostsByLanguage(allPosts, language);
+}
+
+/**
+ * Obtém posts por idioma, incluindo unpublished em modo dev
+ */
+export async function getPostsForLanguage(language: Language, isDev: boolean = false): Promise<BlogPost[]> {
+	const allPosts = await getCollection('blog');
+	return getPostsByLanguage(allPosts, language, isDev);
 }
 
 /**

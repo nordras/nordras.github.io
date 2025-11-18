@@ -2,11 +2,11 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection, type CollectionEntry, render } from 'astro:content';
 import BlogPost from '../../../layouts/BlogPost.astro';
-import { getPublishedPostsForLanguage } from '../../../utils/posts';
+import { getPostsForLanguage } from '../../../utils/posts';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-	// Gerar páginas apenas para posts publicados em inglês
-	const englishPosts = await getPublishedPostsForLanguage('en');
+	const isDev = import.meta.env.DEV;
+	const englishPosts = await getPostsForLanguage('en', isDev);
 	
 	return englishPosts.map((post) => ({
 		params: { id: post.id },

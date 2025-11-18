@@ -1,0 +1,123 @@
+---
+interface Column {
+  title: string;
+  code: string;
+  language?: string;
+}
+
+interface Props {
+  columns: Column[];
+}
+
+const { columns } = Astro.props;
+---
+
+<div class="code-table-container">
+  <div class="code-table-grid" style={`grid-template-columns: repeat(${columns.length}, 1fr);`}>
+    {columns.map((column) => (
+      <div class="code-table-column">
+        <div class="code-table-header">
+          <h3 class="code-table-title">{column.title}</h3>
+        </div>
+        <div class="code-table-content">
+          <pre class="code-block"><code class={`language-${column.language || 'javascript'}`}>{column.code.trim()}</code></pre>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .code-table-container {
+    margin: 2rem 0;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  .code-table-grid {
+    display: grid;
+    gap: 0;
+  }
+
+  @media (max-width: 768px) {
+    .code-table-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .code-table-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .code-table-column:last-child {
+    border-right: none;
+  }
+
+  @media (max-width: 768px) {
+    .code-table-column {
+      border-right: none;
+    }
+
+    .code-table-column:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .code-table-header {
+
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgb(255, 255, 255);
+  }
+
+  .code-table-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .code-table-content {
+    padding: 0;
+    flex: 1;
+    background: rgb(24 24 27);
+  }
+
+  .code-block {
+    margin: 0;
+    padding: 1.5rem;
+    background: transparent;
+    border-radius: 0;
+    overflow-x: auto;
+    height: 100%;
+  }
+
+  .code-block code {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: rgb(226 232 240);
+  }
+
+  /* Scrollbar customizado */
+  .code-block::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .code-block::-webkit-scrollbar-track {
+    background: rgb(39 39 42);
+  }
+
+  .code-block::-webkit-scrollbar-thumb {
+    background: rgb(99 102 241);
+    border-radius: 4px;
+  }
+
+  .code-block::-webkit-scrollbar-thumb:hover {
+    background: rgb(129 140 248);
+  }
+</style>

@@ -186,16 +186,6 @@
     box-shadow: 0 20px 40px rgb(0 0 0 / 0.6), 0 0 0 1px rgba(99, 102, 241, 0.2);
   }
   
-  .prose pre::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--gradient-accent);
-  }
-  
   .prose pre code {
     background: transparent;
     color: inherit;
@@ -280,19 +270,6 @@
   .prose pre .token.operator,
   .prose pre .token.punctuation {
     color: rgb(var(--color-text-secondary));
-  }
-  
-  /* Copy button for code blocks */
-  .prose pre::before {
-    content: attr(data-language);
-    position: absolute;
-    top: 0.75rem;
-    right: 1rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgb(148 163 184);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
   
   .prose blockquote {

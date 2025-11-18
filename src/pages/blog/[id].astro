@@ -1,11 +1,12 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
-import { getPublishedPosts } from '../../utils/posts';
+import { getPostsForLanguage } from '../../utils/posts';
 
 export async function getStaticPaths() {
-	// Gerar páginas apenas para posts publicados
-	const posts = await getPublishedPosts();
+	// Gerar páginas para posts (incluindo unpublished em dev)
+	const isDev = import.meta.env.DEV;
+	const posts = await getPostsForLanguage('pt', isDev);
 	return posts.map((post) => ({
 		params: { id: post.id },
 		props: post,
