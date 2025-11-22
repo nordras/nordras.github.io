@@ -1,5 +1,5 @@
 ---
-title: 'Understanding react step 0 - Components, Elements and Instances'
+title: 'Entendendo react step 0 - Components, Elements e Instances'
 description: ''
 pubDate: 'Nov 10 2025'
 language: 'pt'
@@ -24,7 +24,7 @@ Ao longo dos anos jQuery foi se tornando pesado e complexo devido a escala e com
 React se tornou popular e hoje é uma das biblioteca mais usadas.
 
 ## Princípio
-Componentes, Elementos e Instâncias são conceitos fundamentais para compreenção de como o React opera.
+<b><i>Componentes, Elementos e Instâncias</i></b> são conceitos fundamentais para compreenção de como o React opera.
 
 
 São funções ou classes que retornam elementos React, são reutilizáveis e contém lógica de comportamento, UI e estado. O react vem com a premissa de compôr a UI através de componentes, reutilizar estes
@@ -32,9 +32,14 @@ componentes e fazer a gestão de estado ligados a UI nestes componentes. Em form
 Podemos pensar nos componentes como projetos arquitetônicos, os elementos como os desenhos técnicos e as instâncias como a construção física.
 
 <CodeTable columns={[
-  {
-    title: 'Componente React',
-    code: `function Button() {
+  { id: 'component', title: 'Componente React' },
+  { id: 'element', title: 'Elemento React' },
+  { id: 'instance', title: 'Instância no DOM' }
+]}>
+  <div data-code-column="component">
+
+```jsx
+function Button() {
   return <button>Click</button>;
 }
 
@@ -43,12 +48,15 @@ class Button extends React.Component {
   render() {
     return <button>Click</button>;
   }
-}`,
-    language: 'jsx'
-  },
-  {
-    title: 'Elemento React',
-    code: `const element = <Button />;
+}
+```
+
+  </div>
+
+  <div data-code-column="element">
+
+```jsx
+const element = <Button />;
 
 // Representa:
 {
@@ -56,31 +64,32 @@ class Button extends React.Component {
   props: {},
   key: null,
   ref: null
-}`,
-    language: 'jsx'
-  },
-  {
-    title: 'Instância no DOM',
-    code: `ReactDOM.render(
+}
+```
+
+  </div>
+
+  <div data-code-column="instance">
+
+```jsx
+ReactDOM.render(
   element, 
   container
 );
 
 // Resultado no DOM:
-<button>Click</button>`,
-    language: 'jsx'
-  }
-]} />
+<button>Click</button>
+```
 
-
-## Conceitos
+  </div>
+</CodeTable>
 
 ### Evolução dos Seletores DOM
 
 Para entender melhor o valor que React traz, vamos comparar como a mesma funcionalidade evoluiu ao longo do tempo:
 
 <Tabs tabs={[
-  { id: 'vanilla', label: 'JavaScript Vanilla' },
+  { id: 'vanilla', label: 'JavaScript' },
   { id: 'jquery', label: 'jQuery' },
   { id: 'react', label: 'React' }
 ]}>
@@ -183,4 +192,179 @@ function TodoList({ todos }) {
 
   </div>
 </Tabs>
+
+## Performance e Otimização
+
+Um dos principais benefícios do React é a otimização de performance através do **Virtual DOM**. Vamos entender as diferenças de performance entre as abordagens:
+
+<Tabs tabs={[
+  { id: 'vanilla-perf', label: 'JavaScript Vanilla' },
+  { id: 'jquery-perf', label: 'jQuery' },
+  { id: 'react-perf', label: 'React' }
+]}>
+  <div data-tab-content="vanilla-perf">
+
+### Manipulação Direta do DOM
+
+```javascript
+// ❌ Problema: Múltiplas operações custosas no DOM
+function updateList(items) {
+  const list = document.getElementById('list');
+  
+  // Cada operação causa reflow/repaint
+  list.innerHTML = ''; // Reflow 1
+  
+  items.forEach(item => {
+    const li = document.createElement('li'); // Reflow 2
+    li.textContent = item.name;
+    list.appendChild(li); // Reflow 3, 4, 5...
+  });
+}
+
+// Resultado: 1 + N reflows (muito custoso!)
+```
+
+**Problemas:**
+- Cada alteração no DOM causa reflow/repaint
+- Sem otimização automática
+- Difícil de otimizar manualmente
+- Performance degrada com escala
+
+</div>
+
+  <div data-tab-content="jquery-perf">
+
+### jQuery - Melhor, mas ainda limitado
+
+```javascript
+// ⚠️ Melhor, mas ainda manipula DOM diretamente
+function updateList(items) {
+  const $list = $('#list');
+  
+  // Reduz reflows usando fragment
+  $list.empty(); // Reflow 1
+  
+  const fragment = $(document.createDocumentFragment());
+  
+  items.forEach(item => {
+    fragment.append(
+      $('<li>').text(item.name)
+    );
+  });
+  
+  $list.append(fragment); // Reflow 2
+}
+
+// Resultado: 2 reflows (melhor, mas manual)
+```
+
+**Problemas:**
+- Requer otimização manual (fragments)
+- Ainda manipula DOM diretamente
+- Sem comparação inteligente
+- Desenvolvedores frequentemente esquecem otimizar
+
+</div>
+
+  <div data-tab-content="react-perf">
+
+### React - Virtual DOM e Reconciliação
+
+```jsx
+// ✅ React otimiza automaticamente
+function List({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// React internamente:
+// 1. Cria Virtual DOM (JavaScript puro)
+// 2. Compara com Virtual DOM anterior (diff)
+// 3. Calcula mudanças mínimas necessárias
+// 4. Aplica apenas mudanças no DOM real
+// 5. Agrupa operações (batching)
+```
+
+**Vantagens:**
+- ✅ **Virtual DOM**: Operações em JavaScript (rápido)
+- ✅ **Diffing**: Calcula mudanças mínimas
+- ✅ **Batching**: Agrupa updates
+- ✅ **Reconciliação**: Reutiliza elementos existentes
+- ✅ **Automático**: Sem código extra
+
+</div>
+</Tabs>
+
+### Como o Virtual DOM Funciona
+
+<CodeTable columns={[
+  { id: 'initial', title: '1. Estado Inicial' },
+  { id: 'new', title: '2. Novo Estado' },
+  { id: 'update', title: '3. Update Mínimo' }
+]}>
+  <div data-code-column="initial">
+
+```jsx
+// Virtual DOM
+{
+  type: 'ul',
+  children: [
+    { type: 'li', text: 'Item 1' },
+    { type: 'li', text: 'Item 2' }
+  ]
+}
+
+// DOM Real
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+</ul>
+```
+
+  </div>
+
+  <div data-code-column="new">
+
+```jsx
+// Virtual DOM atualizado
+{
+  type: 'ul',
+  children: [
+    { type: 'li', text: 'Item 1' },
+    { type: 'li', text: 'Item 2' },
+    { type: 'li', text: 'Item 3' }
+  ]
+}
+
+// React faz diff
+// Detecta: +1 novo item
+```
+
+  </div>
+
+  <div data-code-column="update">
+
+```jsx
+// React aplica apenas:
+ul.appendChild(
+  createElement('li', 'Item 3')
+);
+
+// DOM Real final
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li> ← apenas isto mudou
+</ul>
+```
+
+  </div>
+</CodeTable>
+
+### Benchmark Comparativo
 

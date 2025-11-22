@@ -1,8 +1,7 @@
 ---
 interface Column {
+  id: string;
   title: string;
-  code: string;
-  language?: string;
 }
 
 interface Props {
@@ -13,111 +12,104 @@ const { columns } = Astro.props;
 ---
 
 <div class="code-table-container">
-  <div class="code-table-grid" style={`grid-template-columns: repeat(${columns.length}, 1fr);`}>
+  <div class="code-table-header">
     {columns.map((column) => (
-      <div class="code-table-column">
-        <div class="code-table-header">
-          <h3 class="code-table-title">{column.title}</h3>
-        </div>
-        <div class="code-table-content">
-          <pre class="code-block"><code class={`language-${column.language || 'javascript'}`}>{column.code.trim()}</code></pre>
-        </div>
+      <div class="code-table-column-header">
+        <h3>{column.title}</h3>
       </div>
     ))}
+  </div>
+  
+  <div class="code-table-content">
+    <slot />
   </div>
 </div>
 
 <style>
   .code-table-container {
-    margin: 2rem 0;
-    border: 1px solid #374151;
+    margin: 1.5rem 0;
+    border: 1px solid rgb(63 63 70);
     border-radius: 0.75rem;
     overflow: hidden;
-  }
-
-  .code-table-grid {
-    display: grid;
-    gap: 0;
-  }
-
-  @media (max-width: 768px) {
-    .code-table-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .code-table-column {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .code-table-column:last-child {
-    border-right: none;
-  }
-
-  @media (max-width: 768px) {
-    .code-table-column {
-      border-right: none;
-    }
-
-    .code-table-column:last-child {
-      border-bottom: none;
-    }
+    background: rgb(24 24 27);
   }
 
   .code-table-header {
-
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid rgb(255, 255, 255);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    background: rgb(39 39 42);
+    border-bottom: 1px solid rgb(63 63 70);
   }
 
-  .code-table-title {
+  .code-table-column-header {
+    padding: 0.75rem 1rem;
+    border-right: 1px solid rgb(63 63 70);
+  }
+
+  .code-table-column-header:last-child {
+    border-right: none;
+  }
+
+  .code-table-column-header h3 {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(212 212 216);
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
   .code-table-content {
-    padding: 0;
-    flex: 1;
-    background: rgb(24 24 27);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
   }
 
-  .code-block {
+  .code-table-content :global([data-code-column]) {
+    border-right: 1px solid rgb(63 63 70);
+    overflow-x: auto;
+  }
+
+  .code-table-content :global([data-code-column]:last-child) {
+    border-right: none;
+  }
+
+  .code-table-content :global([data-code-column] pre) {
     margin: 0;
     padding: 1.5rem;
     background: transparent;
-    border-radius: 0;
-    overflow-x: auto;
     height: 100%;
   }
 
-  .code-block code {
-    font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.875rem;
-    line-height: 1.7;
-    color: rgb(226 232 240);
-  }
+  @media (max-width: 768px) {
+    .code-table-header {
+      grid-auto-flow: row;
+      grid-auto-columns: unset;
+    }
 
-  /* Scrollbar customizado */
-  .code-block::-webkit-scrollbar {
-    height: 8px;
-  }
+    .code-table-column-header {
+      border-right: none;
+      border-bottom: 1px solid rgb(63 63 70);
+    }
 
-  .code-block::-webkit-scrollbar-track {
-    background: rgb(39 39 42);
-  }
+    .code-table-column-header:last-child {
+      border-bottom: none;
+    }
 
-  .code-block::-webkit-scrollbar-thumb {
-    background: rgb(99 102 241);
-    border-radius: 4px;
-  }
+    .code-table-content {
+      grid-auto-flow: row;
+      grid-auto-columns: unset;
+    }
 
-  .code-block::-webkit-scrollbar-thumb:hover {
-    background: rgb(129 140 248);
+    .code-table-content :global([data-code-column]) {
+      border-right: none;
+      border-bottom: 1px solid rgb(63 63 70);
+    }
+
+    .code-table-content :global([data-code-column]:last-child) {
+      border-bottom: none;
+    }
   }
 </style>
