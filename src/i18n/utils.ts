@@ -3,11 +3,11 @@ import { translations, type Language, type TranslationKey } from './translations
 const postMapping: Record<string, Record<Language, string>> = {
   'using-mdx': {
     pt: 'using-mdx',
-    en: 'using-mdx-en'
+    en: 'using-mdx'
   },
-  'react-components-elements-instances': {
-    pt: 'react-components-elements-instances',
-    en: 'react-components-elements-instances-en'
+  '0-react-components-elements-instances': {
+    pt: '0-react-components-elements-instances',
+    en: '0-react-components-elements-instances'
   }
 };
 

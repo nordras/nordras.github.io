@@ -13,6 +13,9 @@ const formatDate = getDateFormatter(lang);
 // Obter posts em inglês (incluindo unpublished em dev)
 const isDev = import.meta.env.DEV;
 const posts = await getPostsForLanguage('en', isDev);
+
+// Helper para remover sufixo -en do ID
+const cleanId = (id: string) => id.replace(/-en$/, '');
 ---
 
 <!doctype html>
@@ -47,7 +50,7 @@ const posts = await getPostsForLanguage('en', isDev);
 							</div>
 							
 							<h2 class="text-xl font-bold text-zinc-50 mb-3 hover:text-indigo-300 transition-colors group-hover:drop-shadow-lg">
-								<a href={`/blog/${post.id}/`}>
+								<a href={`/en/blog/${cleanId(post.id)}/`}>
 									{post.data.title}
 								</a>
 							</h2>
@@ -63,7 +66,7 @@ const posts = await getPostsForLanguage('en', isDev);
 									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
 								</span>
 								<a 
-									href={`/blog/${post.id}/`}
+									href={`/en/blog/${cleanId(post.id)}/`}
 									class="text-indigo-400 hover:text-green-400 font-medium text-sm flex items-center gap-1 group transition-all duration-300"
 								>
 									{t('blog.readMore')} 

@@ -8,10 +8,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
 	const isDev = import.meta.env.DEV;
 	const englishPosts = await getPostsForLanguage('en', isDev);
 	
-	return englishPosts.map((post) => ({
-		params: { id: post.id },
-		props: { post },
-	}));
+	return englishPosts.map((post) => {
+		// Remove o sufixo -en do ID para URLs mais limpas
+		const cleanId = post.id.replace(/-en$/, '');
+		return {
+			params: { id: cleanId },
+			props: { post },
+		};
+	});
 };
 
 type Props = {
