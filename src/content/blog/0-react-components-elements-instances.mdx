@@ -302,6 +302,16 @@ function List({ items }) {
 
 ### Como o Virtual DOM Funciona
 
+O Virtual DOM é uma representação leve da árvore DOM mantida em memória. É essencialmente um objeto JavaScript que espelha a estrutura do DOM real, mas sem os custos computacionais de manipulação direta.
+
+**Ciclo de Atualização:**
+
+1. **Renderização Inicial**: React cria o Virtual DOM e o DOM real correspondente
+2. **Mudança de Estado**: Quando o estado muda, React cria um novo Virtual DOM
+3. **Diffing (Reconciliação)**: React compara o novo Virtual DOM com o anterior
+4. **Cálculo de Mudanças**: Identifica exatamente quais nós mudaram
+5. **Commit**: Aplica apenas as mudanças necessárias ao DOM real em lote
+
 <CodeTable columns={[
   { id: 'initial', title: '1. Estado Inicial' },
   { id: 'new', title: '2. Novo Estado' },
@@ -366,5 +376,34 @@ ul.appendChild(
   </div>
 </CodeTable>
 
-### Benchmark Comparativo
+**Por que o Virtual DOM é eficiente?**
+
+- **Operações em Memória**: Manipular objetos JavaScript é muito mais rápido que manipular o DOM
+- **Batching**: React agrupa múltiplas mudanças em uma única atualização do DOM
+- **Algoritmo de Diff Otimizado**: Complexidade O(n) ao invés de O(n³) de algoritmos tradicionais de diff de árvore
+- **Heurísticas Inteligentes**: 
+  - Elementos de tipos diferentes geram árvores completamente diferentes
+  - Elementos com keys permitem identificação consistente entre renderizações
+  - Mudanças de propriedades não recriam o elemento, apenas atualizam atributos
+
+### Quando cada abordagem faz sentido
+
+**JavaScript Vanilla:**
+- ✅ Projetos muito simples
+- ✅ Performance crítica em operações isoladas
+- ✅ Sem dependências
+- ❌ Apps complexas com estado
+
+**jQuery:**
+- ✅ Projetos legados
+- ✅ Manipulações simples do DOM
+- ✅ Compatibilidade com navegadores antigos
+- ❌ SPAs modernas
+
+**React:**
+- ✅ Single Page Applications (SPAs)
+- ✅ Interfaces complexas com muito estado
+- ✅ Performance em escala
+- ✅ Manutenibilidade e componentização
+- ❌ Sites estáticos simples (overkill)
 

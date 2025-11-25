@@ -298,6 +298,16 @@ function List({ items }) {
 
 ### How Virtual DOM Works
 
+The Virtual DOM is a lightweight representation of the DOM tree kept in memory. It's essentially a JavaScript object that mirrors the structure of the real DOM, but without the computational costs of direct manipulation.
+
+**Update Cycle:**
+
+1. **Initial Render**: React creates the Virtual DOM and corresponding real DOM
+2. **State Change**: When state changes, React creates a new Virtual DOM
+3. **Diffing (Reconciliation)**: React compares the new Virtual DOM with the previous one
+4. **Change Calculation**: Identifies exactly which nodes changed
+5. **Commit**: Applies only necessary changes to the real DOM in batch
+
 <CodeTable columns={[
   { id: 'initial', title: '1. Initial State' },
   { id: 'new', title: '2. New State' },
@@ -362,20 +372,15 @@ ul.appendChild(
   </div>
 </CodeTable>
 
-### Comparative Benchmark
+**Why is the Virtual DOM efficient?**
 
-| Operation | Vanilla JS | jQuery | React |
-|----------|------------|--------|-------|
-| Render 1,000 items | ~150ms | ~120ms | ~50ms |
-| Update 100 items | ~80ms | ~60ms | ~15ms |
-| Remove 500 items | ~70ms | ~55ms | ~10ms |
-| Reorder list | ~100ms | ~90ms | ~5ms |
-
-**Why is React faster?**
-- Virtual DOM is pure JavaScript (no DOM access)
-- Diff algorithm minimizes DOM operations
-- Batching groups multiple updates
-- Fiber architecture allows render interruption
+- **In-Memory Operations**: Manipulating JavaScript objects is much faster than manipulating the DOM
+- **Batching**: React groups multiple changes into a single DOM update
+- **Optimized Diff Algorithm**: O(n) complexity instead of O(n³) of traditional tree diff algorithms
+- **Smart Heuristics**: 
+  - Elements of different types generate completely different trees
+  - Elements with keys allow consistent identification between renders
+  - Property changes don't recreate the element, just update attributes
 
 ### When Each Approach Makes Sense
 
