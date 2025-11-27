@@ -20,7 +20,7 @@ const isOnBlogPost = currentUrl.includes('/blog/');
 
 ---
 
-<div class="flex items-center space-x-2">
+<div class="flex items-center gap-2">
 	{languages.map((lang) => {
 		const url = getLocalizedUrl(currentUrl, lang.code as Language, currentLang);
 		const isActive = lang.code === currentLang;
