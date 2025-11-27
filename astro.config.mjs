@@ -31,6 +31,15 @@ export default defineConfig({
         '@components': new URL('./src/components', import.meta.url).pathname,
         '@': new URL('./src', import.meta.url).pathname,
       }
+    },
+    build: {
+      // Gera hashes nos assets para cache busting
+      assetsInlineLimit: 0,
+      rollupOptions: {
+        output: {
+          assetFileNames: 'assets/[name].[hash][extname]'
+        }
+      }
     }
   },
 });
