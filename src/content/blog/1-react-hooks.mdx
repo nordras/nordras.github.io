@@ -1,0 +1,155 @@
+
+
+---
+title: 'Entendendo react step 1 - Hooks'
+description: 'Como hooks funcionam, quando usar e suas boas práticas'
+pubDate: 'Nov 30 2025'
+language: 'pt'
+status: 'unpublished'
+tags: ['React', 'JavaScript', 'Frontend', 'Fundamentos']
+---
+
+import Tabs from '../../components/Tabs.astro';
+import CodeTable from '../../components/CodeTable.astro';
+
+## Hooks
+
+React Hooks são funções especiais que permitem "ligar" o estado e outras funcionalidades do React a componentes funcionais.
+Antes dos hooks, apenas componentes de classe podiam ter estado e ciclo de vida, mas com os hooks, componentes funcionais podem fazer tudo isso de forma mais simples e concisa.
+
+## Class Components vs Functional Components
+
+Antes dos Hooks (React 16.8), componentes de classe eram necessários para gerenciar estado e ciclo de vida. Com Hooks, componentes funcionais também passaram a poder acessar o estado.
+
+<CodeTable columns={[
+  { id: 'class', title: 'Class Component' },
+  { id: 'functional', title: 'Functional Component (com Hooks)' }
+]}>
+  <div data-code-column="class">
+
+```jsx
+import React, { Component } from 'react';
+
+class Counter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+      name: props.name
+    };
+    
+    // Bind necessário
+    this.increment = this.increment.bind(this);
+  }
+  
+  componentDidMount() {
+    console.log('Componente montado');
+    document.title = `${this.state.count} clicks`;
+  }
+  
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.count !== this.state.count) {
+      document.title = `${this.state.count} clicks`;
+    }
+  }
+  
+  componentWillUnmount() {
+    console.log('Componente desmontado');
+  }
+  
+  increment() {
+    this.setState({ count: this.state.count + 1 });
+  }
+  
+  render() {
+    return (
+      <div>
+        <h2>{this.state.name}</h2>
+        <p>Você clicou {this.state.count} vezes</p>
+        <button onClick={this.increment}>
+          Incrementar
+        </button>
+      </div>
+    );
+  }
+}
+
+export default Counter;
+```
+
+  </div>
+
+  <div data-code-column="functional">
+
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function Counter({ name }) {
+  const [count, setCount] = useState(0);
+  
+  // Combina componentDidMount + componentDidUpdate
+  useEffect(() => {
+    console.log('Componente montado');
+    document.title = `${count} clicks`;
+    
+    // Retorno = componentWillUnmount
+    return () => {
+      console.log('Componente desmontado');
+    };
+  }, [count]); // Roda quando count muda
+  
+  const increment = () => {
+    setCount(count + 1);
+  };
+  
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Você clicou {count} vezes</p>
+      <button onClick={increment}>
+        Incrementar
+      </button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+  </div>
+</CodeTable>
+
+**Principais diferenças:**
+
+| Aspecto | Class Component | Functional Component |
+|---------|-----------------|---------------------|
+| **Sintaxe** | Mais verboso, usa `this` | Mais conciso e limpo |
+| **Estado** | `this.state` e `this.setState()` | `useState()` hook |
+| **Ciclo de vida** | Métodos separados | `useEffect()` unificado |
+| **Binding** | Necessário para métodos | Não necessário |
+| **Performance** | Ligeiramente mais pesado | Mais leve e otimizado |
+| **Reusabilidade** | HOCs e Render Props | Custom Hooks |
+| **Código** | ~50 linhas | ~30 linhas (40% menor) |
+
+**Por que Functional Components são melhores?**
+- ✅ Menos código boilerplate
+- ✅ Lógica mais clara e organizada
+- ✅ Melhor composição com Custom Hooks
+- ✅ Sem problemas com `this`
+- ✅ Melhor performance (sem overhead de classes)
+
+
+
+## Quais os tipos de hooks?
+
+Ao longo dos anos jQuery foi se tornando pesado e complexo devido à escala e complexidade dos projetos web, bibliotecas como React, Vue, Angular e experimentos como hell.js começaram a surgir e serem adotadas gradativamente.
+React se tornou popular e hoje é uma das bibliotecas mais usadas.
+
+## Princípio
+<b><i>Componentes, Elementos e Instâncias</i></b> são conceitos fundamentais para compreensão de como o React opera.
+
+
+Componentes no react são funções ou classes que retornam elementos React, são reutilizáveis e contêm lógica de comportamento, UI e estado. O React vem com a premissa de compor a UI através de componentes, reutilizar estes
+componentes e fazer a gestão de estado ligados à UI nestes componentes. Em sua forma primária, React é uma biblioteca que transforma componentes em elementos e estes em instâncias que são renderizadas no DOM.
+Podemos pensar nos componentes como projetos arquitetônicos, os elementos como os desenhos técnicos e as instâncias como a construção física.
+

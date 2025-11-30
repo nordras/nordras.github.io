@@ -23,10 +23,10 @@ const posts = await getPostsForLanguage('pt', isDev);
 	<body class="bg-zinc-900 transition-colors duration-300">
 		<Header lang={lang} />
 		<!-- Posts Grid -->
-		<main class="max-w-blog mx-auto py-8">
-			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+		<main class="max-w-blog mx-auto min-h-screen py-8 px-4">
+			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
 				{posts.map((post) => (
-					<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden hover:shadow-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 group relative">
+					<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden hover:shadow-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 group relative grid grid-rows-subgrid row-span-1">
 						<div class="absolute inset-0 bg-gradient-to-r from-indigo-600/0 via-purple-600/0 to-green-600/0 group-hover:from-indigo-600/5 group-hover:via-purple-600/5 group-hover:to-green-600/5 transition-all duration-300"></div>
 						{post.data.status === 'unpublished' && (
 							<div class="absolute top-2 right-2 z-20">
@@ -35,7 +35,7 @@ const posts = await getPostsForLanguage('pt', isDev);
 								</span>
 							</div>
 						)}
-						<div class="p-6 relative z-10">
+						<div class="p-6 relative z-10 flex flex-col h-full">
 							<div class="flex items-center justify-between mb-4">
 								<span class="px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full text-sm font-medium border border-indigo-500/50 shadow-lg">
 									{post.data.title.includes('JavaScript') ? 'JavaScript' : 
@@ -53,12 +53,12 @@ const posts = await getPostsForLanguage('pt', isDev);
 							</h2>
 							
 							{post.data.description && (
-								<p class="text-zinc-300 mb-4 leading-relaxed">
+								<p class="text-zinc-300 mb-4 leading-relaxed flex-grow">
 									{post.data.description}
 								</p>
 							)}
 							
-							<div class="flex items-center justify-between">
+							<div class="flex items-center justify-between mt-auto">
 								<span class="text-zinc-400 text-sm">
 									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
 								</span>
