@@ -27,9 +27,9 @@ const cleanId = (id: string) => id.replace(/-en$/, '');
 		<Header lang={lang} />
 		<!-- Posts Grid -->
 		<main class="max-w-blog min-h-screen mx-auto py-8 px-4">
-			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
+			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" style="grid-auto-rows: auto;">
 				{posts.map((post) => (
-					<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden hover:shadow-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 group relative grid grid-rows-subgrid row-span-1">
+					<article class="bg-gradient-to-br from-zinc-800 to-zinc-800/80 rounded-xl shadow-2xl border border-zinc-700 overflow-hidden hover:shadow-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 group relative grid" style="grid-template-rows: subgrid; grid-row: span 4;">
 						<div class="absolute inset-0 bg-gradient-to-r from-indigo-600/0 via-purple-600/0 to-green-600/0 group-hover:from-indigo-600/5 group-hover:via-purple-600/5 group-hover:to-green-600/5 transition-all duration-300"></div>
 						{post.data.status === 'unpublished' && (
 							<div class="absolute top-2 right-2 z-20">
@@ -38,7 +38,9 @@ const cleanId = (id: string) => id.replace(/-en$/, '');
 								</span>
 							</div>
 						)}
-						<div class="p-6 relative z-10 flex flex-col h-full">
+						
+						<!-- Header: Badge e Data -->
+						<div class="p-6 pb-0 relative z-10">
 							<div class="flex items-center justify-between mb-4">
 								<span class="px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full text-sm font-medium border border-indigo-500/50 shadow-lg">
 									{post.data.title.includes('JavaScript') ? 'JavaScript' : 
@@ -48,20 +50,29 @@ const cleanId = (id: string) => id.replace(/-en$/, '');
 									{formatDate(post.data.pubDate)}
 								</span>
 							</div>
-							
+						</div>
+						
+						<!-- Título -->
+						<div class="px-6 relative z-10">
 							<h2 class="text-xl font-bold text-zinc-50 mb-3 hover:text-indigo-300 transition-colors group-hover:drop-shadow-lg">
 								<a href={`/en/blog/${cleanId(post.id)}/`}>
 									{post.data.title}
 								</a>
 							</h2>
-							
+						</div>
+						
+						<!-- Descrição -->
+						<div class="px-6 relative z-10">
 							{post.data.description && (
-								<p class="text-zinc-300 mb-4 leading-relaxed flex-grow">
+								<p class="text-zinc-300 leading-relaxed">
 									{post.data.description}
 								</p>
 							)}
-							
-							<div class="flex items-center justify-between mt-auto">
+						</div>
+						
+						<!-- Footer: Tempo e Botão -->
+						<div class="px-6 pb-6 pt-4 relative z-10">
+							<div class="flex items-center justify-between">
 								<span class="text-zinc-400 text-sm">
 									{post.body ? Math.ceil(post.body.length / 1000) : 5} {t('blog.readingTime')}
 								</span>
