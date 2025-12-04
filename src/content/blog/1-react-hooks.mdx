@@ -141,16 +141,487 @@ export default Counter;
 
 
 
-## Quais os tipos de hooks?
+## Tipos de Hooks
 
-Ao longo dos anos jQuery foi se tornando pesado e complexo devido à escala e complexidade dos projetos web, bibliotecas como React, Vue, Angular e experimentos como hell.js começaram a surgir e serem adotadas gradativamente.
-React se tornou popular e hoje é uma das bibliotecas mais usadas.
+React oferece hooks nativos para diferentes necessidades. Vamos explorar os principais tipos e quando usar cada um.
 
-## Princípio
-<b><i>Componentes, Elementos e Instâncias</i></b> são conceitos fundamentais para compreensão de como o React opera.
+### State Hooks
 
+State Hooks permitem que componentes "lembrem" informações, como entrada do usuário. São fundamentais para tornar componentes interativos.
 
-Componentes no react são funções ou classes que retornam elementos React, são reutilizáveis e contêm lógica de comportamento, UI e estado. O React vem com a premissa de compor a UI através de componentes, reutilizar estes
-componentes e fazer a gestão de estado ligados à UI nestes componentes. Em sua forma primária, React é uma biblioteca que transforma componentes em elementos e estes em instâncias que são renderizadas no DOM.
-Podemos pensar nos componentes como projetos arquitetônicos, os elementos como os desenhos técnicos e as instâncias como a construção física.
+<CodeTable columns={[
+  { id: 'useState', title: 'useState' },
+  { id: 'useReducer', title: 'useReducer' }
+]}>
+  <div data-code-column="useState">
+
+```jsx
+import { useState } from 'react';
+
+// useState: Para estado simples
+function Counter() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('');
+  
+  return (
+    <div>
+      <input 
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <p>{name} clicou {count} vezes</p>
+      <button onClick={() => setCount(count + 1)}>
+        +1
+      </button>
+    </div>
+  );
+}
+```
+
+  </div>
+
+  <div data-code-column="useReducer">
+
+```jsx
+import { useReducer } from 'react';
+
+// useReducer: Para estado complexo
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, {
+    count: 0,
+    name: ''
+  });
+  
+  return (
+    <div>
+      <input 
+        value={state.name}
+        onChange={(e) => dispatch({ 
+          type: 'SET_NAME', 
+          payload: e.target.value 
+        })}
+      />
+      <p>{state.name} clicou {state.count} vezes</p>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>
+        +1
+      </button>
+    </div>
+  );
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { ...state, count: state.count + 1 };
+    case 'SET_NAME':
+      return { ...state, name: action.payload };
+    default:
+      return state;
+  }
+}
+```
+
+  </div>
+</CodeTable>
+
+**useState - Quando usar:**
+- Estado local simples
+- Valores independentes
+- Lógica de atualização direta
+
+**useReducer - Quando usar:**
+- Estado complexo com múltiplos valores relacionados
+- Lógica de atualização elaborada
+- Transições de estado previsíveis
+
+### Effect Hooks
+
+Effects permitem conectar componentes a sistemas externos, como APIs, DOM do navegador, timers e outras bibliotecas.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+function ChatRoom({ roomId }) {
+  const [messages, setMessages] = useState([]);
+  
+  // useEffect: Sincroniza com sistema externo
+  useEffect(() => {
+    // Setup: conecta ao chat
+    const connection = createConnection(roomId);
+    connection.connect();
+    
+    connection.on('message', (msg) => {
+      setMessages(prev => [...prev, msg]);
+    });
+    
+    // Cleanup: desconecta quando componente desmonta
+    return () => {
+      connection.disconnect();
+    };
+  }, [roomId]); // Re-executa quando roomId muda
+  
+  return (
+    <div>
+      <h2>Sala: {roomId}</h2>
+      {messages.map(msg => (
+        <p key={msg.id}>{msg.text}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+**Quando usar `useEffect`:**
+- ✅ Buscar dados de APIs
+- ✅ Configurar subscriptions
+- ✅ Manipular DOM diretamente
+- ✅ Integrar com bibliotecas externas
+- ❌ **Não use** para transformar dados ou lidar com eventos (use variáveis derivadas)
+
+### Context Hooks
+
+Context permite passar dados profundamente na árvore de componentes sem prop drilling.
+
+<Tabs tabs={[
+  { id: 'sem-context', label: 'Sem Context (Prop Drilling)' },
+  { id: 'com-context', label: 'Com useContext' }
+]}>
+  <div data-tab-content="sem-context">
+
+```jsx
+import { useState } from 'react';
+
+// ❌ Prop Drilling: passar props por múltiplos níveis
+function App() {
+  const [theme, setTheme] = useState('dark');
+  
+  return <Layout theme={theme} setTheme={setTheme} />;
+}
+
+function Layout({ theme, setTheme }) {
+  return (
+    <div>
+      <Header theme={theme} setTheme={setTheme} />
+      <Content theme={theme} />
+    </div>
+  );
+}
+
+function Header({ theme, setTheme }) {
+  return <Button theme={theme} onClick={() => setTheme('light')} />;
+}
+
+function Button({ theme, onClick }) {
+  return (
+    <button className={theme} onClick={onClick}>
+      Trocar Tema
+    </button>
+  );
+}
+```
+
+  </div>
+  
+  <div data-tab-content="com-context">
+
+```jsx
+import { useState, useContext, createContext } from 'react';
+
+// ✅ Context: dados acessíveis em qualquer nível
+const ThemeContext = createContext();
+
+function App() {
+  const [theme, setTheme] = useState('dark');
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <Layout />
+    </ThemeContext.Provider>
+  );
+}
+
+function Layout() {
+  return (
+    <div>
+      <Header />
+      <Content />
+    </div>
+  );
+}
+
+function Header() {
+  return <Button />;
+}
+
+function Button() {
+  const { theme, setTheme } = useContext(ThemeContext);
+  
+  return (
+    <button className={theme} onClick={() => setTheme('light')}>
+      Trocar Tema
+    </button>
+  );
+}
+```
+
+  </div>
+</Tabs>
+
+**Sem Context - Problemas:**
+- Muitos componentes intermediários só repassam props
+- Difícil manutenção
+- Props desnecessárias em componentes
+
+**Com useContext - Vantagens:**
+- Sem prop drilling
+- Componentes intermediários mais limpos
+- Fácil adicionar novos consumidores
+
+### Performance Hooks
+
+Hooks de performance otimizam re-renderizações e cálculos custosos.
+
+<CodeTable columns={[
+  { id: 'useMemo', title: 'useMemo' },
+  { id: 'useCallback', title: 'useCallback' }
+]}>
+  <div data-code-column="useMemo">
+
+```jsx
+import { useMemo } from 'react';
+
+// useMemo: Cacheia resultado de cálculo
+function TodoList({ todos, filter }) {
+  // ❌ Sem useMemo: recalcula toda vez
+  // const filtered = filterTodos(todos, filter);
+  
+  // ✅ Com useMemo: só recalcula quando dependências mudam
+  const filteredTodos = useMemo(() => {
+    console.log('Filtrando todos...');
+    return filterTodos(todos, filter);
+  }, [todos, filter]);
+  
+  return (
+    <ul>
+      {filteredTodos.map(todo => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
+}
+
+function filterTodos(todos, filter) {
+  // Operação cara que queremos cachear
+  return todos.filter(todo => {
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true;
+  });
+}
+```
+
+  </div>
+
+  <div data-code-column="useCallback">
+
+```jsx
+import { useState, useCallback, memo } from 'react';
+
+// useCallback: Cacheia definição de função
+function TodoList({ todos }) {
+  const [filter, setFilter] = useState('all');
+  
+  // ❌ Sem useCallback: nova função a cada render
+  // const handleToggle = (id) => toggleTodo(id);
+  
+  // ✅ Com useCallback: mesma função entre renders
+  const handleToggle = useCallback((id) => {
+    console.log('Toggling todo:', id);
+    toggleTodo(id);
+  }, []); // Dependências vazias = função nunca muda
+  
+  return (
+    <div>
+      <Filter onChange={setFilter} />
+      {todos.map(todo => (
+        <TodoItem 
+          key={todo.id}
+          todo={todo}
+          onToggle={handleToggle}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Componente memo só re-renderiza se props mudarem
+const TodoItem = memo(({ todo, onToggle }) => {
+  console.log('Rendering:', todo.text);
+  return (
+    <div onClick={() => onToggle(todo.id)}>
+      {todo.text}
+    </div>
+  );
+});
+```
+
+  </div>
+</CodeTable>
+
+**useMemo - Quando usar:**
+- Cálculos caros (loops grandes, processamento)
+- Prevenir recálculos desnecessários
+- Apenas se houver problema de performance medido
+
+**useCallback - Quando usar:**
+- Passar callbacks para componentes otimizados com `memo`
+- Dependências de outros hooks (useEffect, useMemo)
+- Prevenir re-renderizações de componentes filhos
+
+### Ref Hooks
+
+Refs permitem acessar valores que não causam re-renderização e referenciar elementos DOM.
+
+```jsx
+import { useRef, useEffect } from 'react';
+
+function Form() {
+  const inputRef = useRef(null);
+  const countRef = useRef(0);
+  
+  useEffect(() => {
+    // Focar input quando componente monta
+    inputRef.current.focus();
+  }, []);
+  
+  const handleClick = () => {
+    // countRef.current não causa re-render quando atualizado
+    countRef.current += 1;
+    console.log('Cliques:', countRef.current);
+    
+    // Acessar DOM diretamente
+    console.log('Valor do input:', inputRef.current.value);
+  };
+  
+  return (
+    <div>
+      <input ref={inputRef} />
+      <button onClick={handleClick}>Clicar</button>
+    </div>
+  );
+}
+```
+
+**Quando usar `useRef`:**
+- ✅ Guardar referência a elemento DOM
+- ✅ Armazenar valores mutáveis sem re-render (timers, IDs)
+- ✅ Guardar valor anterior de uma prop/state
+- ❌ **Não use** para dados que afetam a UI (use `useState`)
+
+### Custom Hooks
+
+Você pode criar seus próprios hooks para reutilizar lógica entre componentes.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+// Custom Hook: Reutiliza lógica de fetch
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    setLoading(true);
+    
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// Usar em múltiplos componentes
+function UserProfile({ userId }) {
+  const { data, loading, error } = useFetch(`/api/users/${userId}`);
+  
+  if (loading) return <p>Carregando...</p>;
+  if (error) return <p>Erro: {error.message}</p>;
+  
+  return <div>{data.name}</div>;
+}
+
+function PostList() {
+  const { data, loading } = useFetch('/api/posts');
+  
+  if (loading) return <p>Carregando posts...</p>;
+  
+  return (
+    <ul>
+      {data.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**Regras para Custom Hooks:**
+- Nome deve começar com `use` (ex: `useAuth`, `useLocalStorage`)
+- Pode usar outros hooks dentro
+- Retorna valores ou funções que componentes podem usar
+
+## Regras dos Hooks
+
+Para hooks funcionarem corretamente, você deve seguir estas regras:
+
+**1. Apenas chame Hooks no nível superior**
+```jsx
+// ❌ ERRADO: dentro de condição
+function Component({ condition }) {
+  if (condition) {
+    const [state, setState] = useState(0); // Erro!
+  }
+}
+
+// ✅ CORRETO: no nível superior
+function Component({ condition }) {
+  const [state, setState] = useState(0);
+  
+  if (condition) {
+    setState(1); // OK
+  }
+}
+```
+
+**2. Apenas chame Hooks de componentes React ou Custom Hooks**
+```jsx
+// ❌ ERRADO: função normal
+function normalFunction() {
+  const [state, setState] = useState(0); // Erro!
+}
+
+// ✅ CORRETO: componente React
+function Component() {
+  const [state, setState] = useState(0); // OK
+}
+
+// ✅ CORRETO: custom hook
+function useCustomHook() {
+  const [state, setState] = useState(0); // OK
+}
+```
+
+**Por que essas regras existem?**
+- React depende da ordem de chamada dos hooks
+- Hooks devem ser chamados na mesma ordem em cada render
+- Isso permite ao React preservar o estado entre re-renderizações
 
