@@ -1,0 +1,627 @@
+
+
+---
+title: 'Entendendo react step 1 - Hooks'
+description: 'Como hooks funcionam, quando usar e suas boas práticas'
+pubDate: 'Nov 30 2025'
+language: 'pt'
+status: 'unpublished'
+tags: ['React', 'JavaScript', 'Frontend', 'Fundamentos']
+---
+
+import Tabs from '../../components/Tabs.astro';
+import CodeTable from '../../components/CodeTable.astro';
+
+## Hooks
+
+React Hooks são funções que permitem o acesso ao estado e outras funcionalidades do React para componentes funcionais. Antes da inserção dos hooks, 
+componentes funcionais eram "sem estado" e não podiam usar recursos como ciclo de vida. Com os hooks, componentes funcionais podem gerenciar estado,
+efeitos colaterais, contexto e muito mais.
+
+## Class Components vs Functional Components
+
+Antes dos Hooks (React 16.8), componentes de classe eram necessários para gerenciar estado e ciclo de vida. Com Hooks, componentes funcionais também passaram a poder acessar o estado.
+
+<CodeTable columns={[
+  { id: 'class', title: 'Class Component' },
+  { id: 'functional', title: 'Functional Component (com Hooks)' }
+]}>
+  <div data-code-column="class">
+
+```jsx
+import React, { Component } from 'react';
+
+class Counter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+      name: props.name
+    };
+    
+    // Bind necessário
+    this.increment = this.increment.bind(this);
+  }
+  
+  componentDidMount() {
+    console.log('Componente montado');
+    document.title = `${this.state.count} clicks`;
+  }
+  
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.count !== this.state.count) {
+      document.title = `${this.state.count} clicks`;
+    }
+  }
+  
+  componentWillUnmount() {
+    console.log('Componente desmontado');
+  }
+  
+  increment() {
+    this.setState({ count: this.state.count + 1 });
+  }
+  
+  render() {
+    return (
+      <div>
+        <h2>{this.state.name}</h2>
+        <p>Você clicou {this.state.count} vezes</p>
+        <button onClick={this.increment}>
+          Incrementar
+        </button>
+      </div>
+    );
+  }
+}
+
+export default Counter;
+```
+
+  </div>
+
+  <div data-code-column="functional">
+
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function Counter({ name }) {
+  const [count, setCount] = useState(0);
+  
+  // Combina componentDidMount + componentDidUpdate
+  useEffect(() => {
+    console.log('Componente montado');
+    document.title = `${count} clicks`;
+    
+    // Retorno = componentWillUnmount
+    return () => {
+      console.log('Componente desmontado');
+    };
+  }, [count]); // Roda quando count muda
+  
+  const increment = () => {
+    setCount(count + 1);
+  };
+  
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Você clicou {count} vezes</p>
+      <button onClick={increment}>
+        Incrementar
+      </button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+  </div>
+</CodeTable>
+
+**Principais diferenças:**
+
+| Aspecto | Class Component | Functional Component |
+|---------|-----------------|---------------------|
+| **Sintaxe** | Mais verboso, usa `this` | Mais conciso e limpo |
+| **Estado** | `this.state` e `this.setState()` | `useState()` hook |
+| **Ciclo de vida** | Métodos separados | `useEffect()` unificado |
+| **Binding** | Necessário para métodos | Não necessário |
+| **Performance** | Ligeiramente mais pesado | Mais leve e otimizado |
+| **Reusabilidade** | HOCs e Render Props | Custom Hooks |
+| **Código** | ~50 linhas | ~30 linhas (40% menor) |
+
+**Por que Functional Components são melhores?**
+- ✅ Menos código boilerplate
+- ✅ Lógica mais clara e organizada
+- ✅ Melhor composição com Custom Hooks
+- ✅ Sem problemas com `this`
+- ✅ Melhor performance (sem overhead de classes)
+
+
+
+## Tipos de Hooks
+
+React oferece hooks nativos para diferentes necessidades. Vamos explorar os principais tipos e quando usar cada um.
+
+### State Hooks
+
+State Hooks permitem que componentes "lembrem" informações, como entrada do usuário. São fundamentais para tornar componentes interativos.
+
+<CodeTable columns={[
+  { id: 'useState', title: 'useState' },
+  { id: 'useReducer', title: 'useReducer' }
+]}>
+  <div data-code-column="useState">
+
+```jsx
+import { useState } from 'react';
+
+// useState: Para estado simples
+function Counter() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('');
+  
+  return (
+    <div>
+      <input 
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <p>{name} clicou {count} vezes</p>
+      <button onClick={() => setCount(count + 1)}>
+        +1
+      </button>
+    </div>
+  );
+}
+```
+
+  </div>
+
+  <div data-code-column="useReducer">
+
+```jsx
+import { useReducer } from 'react';
+
+// useReducer: Para estado complexo
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, {
+    count: 0,
+    name: ''
+  });
+  
+  return (
+    <div>
+      <input 
+        value={state.name}
+        onChange={(e) => dispatch({ 
+          type: 'SET_NAME', 
+          payload: e.target.value 
+        })}
+      />
+      <p>{state.name} clicou {state.count} vezes</p>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>
+        +1
+      </button>
+    </div>
+  );
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { ...state, count: state.count + 1 };
+    case 'SET_NAME':
+      return { ...state, name: action.payload };
+    default:
+      return state;
+  }
+}
+```
+
+  </div>
+</CodeTable>
+
+**useState - Quando usar:**
+- Estado local simples
+- Valores independentes
+- Lógica de atualização direta
+
+**useReducer - Quando usar:**
+- Estado complexo com múltiplos valores relacionados
+- Lógica de atualização elaborada
+- Transições de estado previsíveis
+
+### Effect Hooks
+
+Effects permitem conectar componentes a sistemas externos, como APIs, DOM do navegador, timers e outras bibliotecas.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+function ChatRoom({ roomId }) {
+  const [messages, setMessages] = useState([]);
+  
+  // useEffect: Sincroniza com sistema externo
+  useEffect(() => {
+    // Setup: conecta ao chat
+    const connection = createConnection(roomId);
+    connection.connect();
+    
+    connection.on('message', (msg) => {
+      setMessages(prev => [...prev, msg]);
+    });
+    
+    // Cleanup: desconecta quando componente desmonta
+    return () => {
+      connection.disconnect();
+    };
+  }, [roomId]); // Re-executa quando roomId muda
+  
+  return (
+    <div>
+      <h2>Sala: {roomId}</h2>
+      {messages.map(msg => (
+        <p key={msg.id}>{msg.text}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+**Quando usar `useEffect`:**
+- ✅ Buscar dados de APIs
+- ✅ Configurar subscriptions
+- ✅ Manipular DOM diretamente
+- ✅ Integrar com bibliotecas externas
+- ❌ **Não use** para transformar dados ou lidar com eventos (use variáveis derivadas)
+
+### Context Hooks
+
+Context permite passar dados profundamente na árvore de componentes sem prop drilling.
+
+<Tabs tabs={[
+  { id: 'sem-context', label: 'Sem Context (Prop Drilling)' },
+  { id: 'com-context', label: 'Com useContext' }
+]}>
+  <div data-tab-content="sem-context">
+
+```jsx
+import { useState } from 'react';
+
+// ❌ Prop Drilling: passar props por múltiplos níveis
+function App() {
+  const [theme, setTheme] = useState('dark');
+  
+  return <Layout theme={theme} setTheme={setTheme} />;
+}
+
+function Layout({ theme, setTheme }) {
+  return (
+    <div>
+      <Header theme={theme} setTheme={setTheme} />
+      <Content theme={theme} />
+    </div>
+  );
+}
+
+function Header({ theme, setTheme }) {
+  return <Button theme={theme} onClick={() => setTheme('light')} />;
+}
+
+function Button({ theme, onClick }) {
+  return (
+    <button className={theme} onClick={onClick}>
+      Trocar Tema
+    </button>
+  );
+}
+```
+
+  </div>
+  
+  <div data-tab-content="com-context">
+
+```jsx
+import { useState, useContext, createContext } from 'react';
+
+// ✅ Context: dados acessíveis em qualquer nível
+const ThemeContext = createContext();
+
+function App() {
+  const [theme, setTheme] = useState('dark');
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <Layout />
+    </ThemeContext.Provider>
+  );
+}
+
+function Layout() {
+  return (
+    <div>
+      <Header />
+      <Content />
+    </div>
+  );
+}
+
+function Header() {
+  return <Button />;
+}
+
+function Button() {
+  const { theme, setTheme } = useContext(ThemeContext);
+  
+  return (
+    <button className={theme} onClick={() => setTheme('light')}>
+      Trocar Tema
+    </button>
+  );
+}
+```
+
+  </div>
+</Tabs>
+
+**Sem Context - Problemas:**
+- Muitos componentes intermediários só repassam props
+- Difícil manutenção
+- Props desnecessárias em componentes
+
+**Com useContext - Vantagens:**
+- Sem prop drilling
+- Componentes intermediários mais limpos
+- Fácil adicionar novos consumidores
+
+### Performance Hooks
+
+Hooks de performance otimizam re-renderizações e cálculos custosos.
+
+<CodeTable columns={[
+  { id: 'useMemo', title: 'useMemo' },
+  { id: 'useCallback', title: 'useCallback' }
+]}>
+  <div data-code-column="useMemo">
+
+```jsx
+import { useMemo } from 'react';
+
+// useMemo: Cacheia resultado de cálculo
+function TodoList({ todos, filter }) {
+  // ❌ Sem useMemo: recalcula toda vez
+  // const filtered = filterTodos(todos, filter);
+  
+  // ✅ Com useMemo: só recalcula quando dependências mudam
+  const filteredTodos = useMemo(() => {
+    console.log('Filtrando todos...');
+    return filterTodos(todos, filter);
+  }, [todos, filter]);
+  
+  return (
+    <ul>
+      {filteredTodos.map(todo => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
+}
+
+function filterTodos(todos, filter) {
+  // Operação cara que queremos cachear
+  return todos.filter(todo => {
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true;
+  });
+}
+```
+
+  </div>
+
+  <div data-code-column="useCallback">
+
+```jsx
+import { useState, useCallback, memo } from 'react';
+
+// useCallback: Cacheia definição de função
+function TodoList({ todos }) {
+  const [filter, setFilter] = useState('all');
+  
+  // ❌ Sem useCallback: nova função a cada render
+  // const handleToggle = (id) => toggleTodo(id);
+  
+  // ✅ Com useCallback: mesma função entre renders
+  const handleToggle = useCallback((id) => {
+    console.log('Toggling todo:', id);
+    toggleTodo(id);
+  }, []); // Dependências vazias = função nunca muda
+  
+  return (
+    <div>
+      <Filter onChange={setFilter} />
+      {todos.map(todo => (
+        <TodoItem 
+          key={todo.id}
+          todo={todo}
+          onToggle={handleToggle}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Componente memo só re-renderiza se props mudarem
+const TodoItem = memo(({ todo, onToggle }) => {
+  console.log('Rendering:', todo.text);
+  return (
+    <div onClick={() => onToggle(todo.id)}>
+      {todo.text}
+    </div>
+  );
+});
+```
+
+  </div>
+</CodeTable>
+
+**useMemo - Quando usar:**
+- Cálculos caros (loops grandes, processamento)
+- Prevenir recálculos desnecessários
+- Apenas se houver problema de performance medido
+
+**useCallback - Quando usar:**
+- Passar callbacks para componentes otimizados com `memo`
+- Dependências de outros hooks (useEffect, useMemo)
+- Prevenir re-renderizações de componentes filhos
+
+### Ref Hooks
+
+Refs permitem acessar valores que não causam re-renderização e referenciar elementos DOM.
+
+```jsx
+import { useRef, useEffect } from 'react';
+
+function Form() {
+  const inputRef = useRef(null);
+  const countRef = useRef(0);
+  
+  useEffect(() => {
+    // Focar input quando componente monta
+    inputRef.current.focus();
+  }, []);
+  
+  const handleClick = () => {
+    // countRef.current não causa re-render quando atualizado
+    countRef.current += 1;
+    console.log('Cliques:', countRef.current);
+    
+    // Acessar DOM diretamente
+    console.log('Valor do input:', inputRef.current.value);
+  };
+  
+  return (
+    <div>
+      <input ref={inputRef} />
+      <button onClick={handleClick}>Clicar</button>
+    </div>
+  );
+}
+```
+
+**Quando usar `useRef`:**
+- ✅ Guardar referência a elemento DOM
+- ✅ Armazenar valores mutáveis sem re-render (timers, IDs)
+- ✅ Guardar valor anterior de uma prop/state
+- ❌ **Não use** para dados que afetam a UI (use `useState`)
+
+### Custom Hooks
+
+Você pode criar seus próprios hooks para reutilizar lógica entre componentes.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+// Custom Hook: Reutiliza lógica de fetch
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    setLoading(true);
+    
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// Usar em múltiplos componentes
+function UserProfile({ userId }) {
+  const { data, loading, error } = useFetch(`/api/users/${userId}`);
+  
+  if (loading) return <p>Carregando...</p>;
+  if (error) return <p>Erro: {error.message}</p>;
+  
+  return <div>{data.name}</div>;
+}
+
+function PostList() {
+  const { data, loading } = useFetch('/api/posts');
+  
+  if (loading) return <p>Carregando posts...</p>;
+  
+  return (
+    <ul>
+      {data.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**Regras para Custom Hooks:**
+- Nome deve começar com `use` (ex: `useAuth`, `useLocalStorage`)
+- Pode usar outros hooks dentro
+- Retorna valores ou funções que componentes podem usar
+
+## Regras dos Hooks
+
+Para hooks funcionarem corretamente, você deve seguir estas regras:
+
+**1. Apenas chame Hooks no nível superior**
+```jsx
+// ❌ ERRADO: dentro de condição
+function Component({ condition }) {
+  if (condition) {
+    const [state, setState] = useState(0); // Erro!
+  }
+}
+
+// ✅ CORRETO: no nível superior
+function Component({ condition }) {
+  const [state, setState] = useState(0);
+  
+  if (condition) {
+    setState(1); // OK
+  }
+}
+```
+
+**2. Apenas chame Hooks de componentes React ou Custom Hooks**
+```jsx
+// ❌ ERRADO: função normal
+function normalFunction() {
+  const [state, setState] = useState(0); // Erro!
+}
+
+// ✅ CORRETO: componente React
+function Component() {
+  const [state, setState] = useState(0); // OK
+}
+
+// ✅ CORRETO: custom hook
+function useCustomHook() {
+  const [state, setState] = useState(0); // OK
+}
+```
+
+**Por que essas regras existem?**
+- React depende da ordem de chamada dos hooks
+- Hooks devem ser chamados na mesma ordem em cada render
+- Isso permite ao React preservar o estado entre re-renderizações
+

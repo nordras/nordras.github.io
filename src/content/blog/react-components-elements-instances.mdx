@@ -1,0 +1,409 @@
+---
+title: 'Componentes, Elementos e Instâncias'
+description: 'Aprenda os conceitos fundamentais do React: como componentes, elementos e instâncias trabalham juntos para construir aplicações web modernas.'
+pubDate: 'Nov 10 2025'
+language: 'pt'
+status: 'published'
+tags: ['React', 'JavaScript', 'Frontend', 'Fundamentos']
+---
+
+import Tabs from '../../components/Tabs.astro';
+import CodeTable from '../../components/CodeTable.astro';
+
+## React Components, Elements and Instances
+
+A meta deste blog e posts subsequentes é introduzir ao React, fomentar conhecimento, fixar ideias, conceitos e fundamentos sobre tecnologias. Para isto abordarei os temas do básico ao avançado, 
+tentando ser minucioso. Desde já expresso minha gratidão aos leitores.
+Então vamos ao React - temos que entender seu funcionamento e arquitetura.
+
+## Definição e História
+React é uma biblioteca JavaScript criada pelo Facebook (Meta) em meados de 2013 e desde então foi se popularizando e reduzindo o uso de jQuery (2006). Na era jQuery, este veio com a proposta de facilitar a manipulação
+do DOM, para isto ele provê queries para acessar diretamente o DOM. Isto era melhor do que usar diretamente seletores `document.getElementById`, `getElementsByClassName` e outros. 
+
+Ao longo dos anos jQuery foi se tornando pesado e complexo devido à escala e complexidade dos projetos web, bibliotecas como React, Vue, Angular e experimentos como hell.js começaram a surgir e serem adotadas gradativamente.
+React se tornou popular e hoje é uma das bibliotecas mais usadas.
+
+## Princípio
+<b><i>Componentes, Elementos e Instâncias</i></b> são conceitos fundamentais para compreensão de como o React opera.
+
+
+Componentes no react são funções ou classes que retornam elementos React, são reutilizáveis e contêm lógica de comportamento, UI e estado. O React vem com a premissa de compor a UI através de componentes, reutilizar estes
+componentes e fazer a gestão de estado ligados à UI nestes componentes. Em sua forma primária, React é uma biblioteca que transforma componentes em elementos e estes em instâncias que são renderizadas no DOM.
+Podemos pensar nos componentes como projetos arquitetônicos, os elementos como os desenhos técnicos e as instâncias como a construção física.
+
+<CodeTable columns={[
+  { id: 'component', title: 'Componente React' },
+  { id: 'element', title: 'Elemento React' },
+  { id: 'instance', title: 'Instância no DOM' }
+]}>
+  <div data-code-column="component">
+
+```jsx
+function Button() {
+  return <button>Click</button>;
+}
+
+// Ou classe
+class Button extends React.Component {
+  render() {
+    return <button>Click</button>;
+  }
+}
+```
+
+  </div>
+
+  <div data-code-column="element">
+
+```jsx
+const element = <Button />;
+
+// Representa:
+{
+  type: Button,
+  props: {},
+  key: null,
+  ref: null
+}
+```
+
+  </div>
+
+  <div data-code-column="instance">
+
+```jsx
+ReactDOM.render(
+  element, 
+  container
+);
+
+// Resultado no DOM:
+<button>Click</button>
+```
+
+  </div>
+</CodeTable>
+
+### Evolução dos Seletores DOM
+
+Para entender melhor o valor que React traz, vamos comparar como a mesma funcionalidade evoluiu ao longo do tempo:
+
+<Tabs tabs={[
+  { id: 'vanilla', label: 'JavaScript' },
+  { id: 'jquery', label: 'jQuery' },
+  { id: 'react', label: 'React' }
+]}>
+  <div data-tab-content="vanilla">
+
+```javascript
+
+// Seleção de elementos
+const button = document.getElementById('myButton');
+const items = document.getElementsByClassName('item');
+const links = document.querySelectorAll('a.external');
+
+// Evento de de click direto no DOM
+button.addEventListener('click', function() {
+  const newDiv = document.createElement('div');
+  newDiv.className = 'message';
+  newDiv.textContent = 'Clicou!';
+  document.body.appendChild(newDiv);
+});
+
+// Atualização de elementos no DOM
+const list = document.getElementById('todoList');
+list.innerHTML = '';
+todos.forEach(function(todo) {
+  const li = document.createElement('li');
+  li.textContent = todo.text;
+  if (todo.completed) {
+    li.className = 'completed';
+  }
+  list.appendChild(li);
+});
+```
+
+  </div>
+  
+  <div data-tab-content="jquery">
+
+```javascript
+
+// Seleção de elementos
+const $button = $('#myButton');
+const $items = $('.item');
+const $links = $('a.external');
+
+// Evento de de click direto no DOM
+$button.on('click', function() {
+  $('<div>')
+    .addClass('message')
+    .text('Clicou!')
+    .appendTo('body');
+});
+
+// Atualização de elementos no DOM
+const $list = $('#todoList');
+$list.empty();
+$.each(todos, function(index, todo) {
+  $('<li>')
+    .text(todo.text)
+    .toggleClass('completed', todo.completed)
+    .appendTo($list);
+});
+```
+
+  </div>
+  
+  <div data-tab-content="react">
+
+```jsx
+
+// Componente React
+function TodoList({ todos }) {
+  const [message, setMessage] = useState('');
+
+  const handleClick = () => {
+    setMessage('Clicou!');
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick}>
+        Clique aqui
+      </button>
+      
+      {message && <div className="message">{message}</div>}
+      
+      <ul>
+        {todos.map(todo => (
+          <li 
+            key={todo.id}
+            className={todo.completed ? 'completed' : ''}
+          >
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+  </div>
+</Tabs>
+
+## Performance e Otimização
+
+Um dos principais benefícios do React é a otimização de performance através do **Virtual DOM**. Vamos entender as diferenças de performance entre as abordagens:
+
+<Tabs tabs={[
+  { id: 'vanilla-perf', label: 'JavaScript Vanilla' },
+  { id: 'jquery-perf', label: 'jQuery' },
+  { id: 'react-perf', label: 'React' }
+]}>
+  <div data-tab-content="vanilla-perf">
+
+### Manipulação Direta do DOM
+
+```javascript
+// ❌ Problema: Múltiplas operações custosas no DOM
+function updateList(items) {
+  const list = document.getElementById('list');
+  
+  // Cada operação causa reflow/repaint
+  list.innerHTML = ''; // Reflow 1
+  
+  items.forEach(item => {
+    const li = document.createElement('li'); // Reflow 2
+    li.textContent = item.name;
+    list.appendChild(li); // Reflow 3, 4, 5...
+  });
+}
+
+// Resultado: 1 + N reflows (muito custoso!)
+```
+
+**Problemas:**
+- Cada alteração no DOM causa reflow/repaint
+- Sem otimização automática
+- Difícil de otimizar manualmente
+- Performance degrada com escala
+
+</div>
+
+  <div data-tab-content="jquery-perf">
+
+### jQuery - Melhor, mas ainda limitado
+
+```javascript
+// ⚠️ Melhor, mas ainda manipula DOM diretamente
+function updateList(items) {
+  const $list = $('#list');
+  
+  // Reduz reflows usando fragment
+  $list.empty(); // Reflow 1
+  
+  const fragment = $(document.createDocumentFragment());
+  
+  items.forEach(item => {
+    fragment.append(
+      $('<li>').text(item.name)
+    );
+  });
+  
+  $list.append(fragment); // Reflow 2
+}
+
+// Resultado: 2 reflows (melhor, mas manual)
+```
+
+**Problemas:**
+- Requer otimização manual (fragments)
+- Ainda manipula DOM diretamente
+- Sem comparação inteligente
+- Desenvolvedores frequentemente esquecem otimizar
+
+</div>
+
+  <div data-tab-content="react-perf">
+
+### React - Virtual DOM e Reconciliação
+
+```jsx
+// ✅ React otimiza automaticamente
+function List({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// React internamente:
+// 1. Cria Virtual DOM (JavaScript puro)
+// 2. Compara com Virtual DOM anterior (diff)
+// 3. Calcula mudanças mínimas necessárias
+// 4. Aplica apenas mudanças no DOM real
+// 5. Agrupa operações (batching)
+```
+
+**Vantagens:**
+- ✅ **Virtual DOM**: Operações em JavaScript (rápido)
+- ✅ **Diffing**: Calcula mudanças mínimas
+- ✅ **Batching**: Agrupa updates
+- ✅ **Reconciliação**: Reutiliza elementos existentes
+- ✅ **Automático**: Sem código extra
+
+</div>
+</Tabs>
+
+### Como o Virtual DOM Funciona
+
+O Virtual DOM é uma representação leve da árvore DOM mantida em memória. É essencialmente um objeto JavaScript que espelha a estrutura do DOM real, mas sem os custos computacionais de manipulação direta.
+
+**Ciclo de Atualização:**
+
+1. **Renderização Inicial**: React cria o Virtual DOM e o DOM real correspondente
+2. **Mudança de Estado**: Quando o estado muda, React cria um novo Virtual DOM
+3. **Diffing (Reconciliação)**: React compara o novo Virtual DOM com o anterior
+4. **Cálculo de Mudanças**: Identifica exatamente quais nós mudaram
+5. **Commit**: Aplica apenas as mudanças necessárias ao DOM real em lote
+
+<CodeTable columns={[
+  { id: 'initial', title: '1. Estado Inicial' },
+  { id: 'new', title: '2. Novo Estado' },
+  { id: 'update', title: '3. Update Mínimo' }
+]}>
+  <div data-code-column="initial">
+
+```jsx
+// Virtual DOM
+{
+  type: 'ul',
+  children: [
+    { type: 'li', text: 'Item 1' },
+    { type: 'li', text: 'Item 2' }
+  ]
+}
+
+// DOM Real
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+</ul>
+```
+
+  </div>
+
+  <div data-code-column="new">
+
+```jsx
+// Virtual DOM atualizado
+{
+  type: 'ul',
+  children: [
+    { type: 'li', text: 'Item 1' },
+    { type: 'li', text: 'Item 2' },
+    { type: 'li', text: 'Item 3' }
+  ]
+}
+
+// React faz diff
+// Detecta: +1 novo item
+```
+
+  </div>
+
+  <div data-code-column="update">
+
+```jsx
+// React aplica apenas:
+ul.appendChild(
+  createElement('li', 'Item 3')
+);
+
+// DOM Real final
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li> ← apenas isto mudou
+</ul>
+```
+
+  </div>
+</CodeTable>
+
+**Por que o Virtual DOM é eficiente?**
+
+- **Operações em Memória**: Manipular objetos JavaScript é muito mais rápido que manipular o DOM
+- **Batching**: React agrupa múltiplas mudanças em uma única atualização do DOM
+- **Algoritmo de Diff Otimizado**: Complexidade O(n) ao invés de O(n³) de algoritmos tradicionais de diff de árvore
+- **Heurísticas Inteligentes**: 
+  - Elementos de tipos diferentes geram árvores completamente diferentes
+  - Elementos com keys permitem identificação consistente entre renderizações
+  - Mudanças de propriedades não recriam o elemento, apenas atualizam atributos
+
+### Quando cada abordagem faz sentido
+
+**JavaScript Vanilla:**
+- ✅ Projetos muito simples
+- ✅ Performance crítica em operações isoladas
+- ✅ Sem dependências
+- ❌ Apps complexas com estado
+
+**jQuery:**
+- ✅ Projetos legados
+- ✅ Manipulações simples do DOM
+- ✅ Compatibilidade com navegadores antigos
+- ❌ SPAs modernas
+
+**React:**
+- ✅ Single Page Applications (SPAs)
+- ✅ Interfaces complexas com muito estado
+- ✅ Performance em escala
+- ✅ Manutenibilidade e componentização
+- ❌ Sites estáticos simples (overkill)
+
