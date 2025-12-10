@@ -1,0 +1,415 @@
+---
+title: 'Entendendo React Step -1 - JSX'
+description: 'Entenda o que é JSX, como funciona e por que é usado no React. Aprenda a diferença entre JSX e React, e como o código é transformado.'
+pubDate: 'Dec 10 2025'
+language: 'pt'
+status: 'published'
+tags: ['React', 'JavaScript', 'JSX', 'Frontend', 'Fundamentos']
+---
+
+import CodeTable from '../../components/CodeTable.astro';
+import Tabs from '../../components/Tabs.astro';
+
+## JSX e React?
+
+É importante entender que **JSX não é React, e React não é JSX.** Essa é uma confusão comum que precisa ser esclarecida desde o início.
+
+JSX foi criado pelo Facebook em 2013, junto com o React. O mesmo tinha precedentes, possiveis inspirações e concorrentes na época:
+
+- **E4X (ECMAScript for XML)** - Extensão do JavaScript de 2004 que permitia XML nativo no código
+- **MXML (Adobe Flex)** - Linguagem XML para criar interfaces em Flash/ActionScript
+- **Templates em strings** - Bibliotecas como Handlebars, Mustache usavam strings para templates
+
+Em 2011-2012, o Facebook enfrentava problemas de performance e manutenibilidade com sua UI. Jordan Walke, engenheiro do Facebook, começou a experimentar:
+
+```javascript
+// Problema: Código imperativo difícil de manter
+$('#button').click(function() {
+  $('#message').text('Clicou!');
+  $('#counter').text(parseInt($('#counter').text()) + 1);
+});
+
+// Solução: UI declarativa
+<Button onClick={() => {
+  setMessage('Clicou!');
+  setCounter(counter + 1);
+}} />
+```
+
+**Controvérsia inicial (2013-2014):**
+
+Quando o React foi apresentado na JSConf US 2013, a comunidade reagiu negativamente:
+
+- ❌ "Misturar HTML e JavaScript é uma má prática!"
+- ❌ "Viola a separação de responsabilidades!"
+- ❌ "Parece código dos anos 90 (PHP inline)!"
+- ❌ "XML no JavaScript? Isso é E4X de novo?"
+
+Com o tempo vantagens se sobressairam tais como:
+
+- ✅ Componentes encapsulam lógica E apresentação
+- ✅ Mais fácil de entender o fluxo de dados
+- ✅ Erros detectados em tempo de compilação
+- ✅ Refatoração mais segura
+
+**Evolução (2014-2025):**
+
+```jsx
+// 2013: JSX básico
+React.createClass({
+  render: function() {
+    return <div>Hello {this.props.name}</div>;
+  }
+});
+
+// 2015: ES6 Classes
+class Hello extends React.Component {
+  render() {
+    return <div>Hello {this.props.name}</div>;
+  }
+}
+
+// 2019: Hooks + JSX
+function Hello({ name }) {
+  return <div>Hello {name}</div>;
+}
+
+// 2020+: React 17 - Novo JSX Transform
+// Não precisa mais de: import React from 'react'
+function Hello({ name }) {
+  return <div>Hello {name}</div>; // Funciona!
+}
+```
+
+## JSX vs React
+
+| React | JSX |
+|-------|-----|
+| Biblioteca JavaScript | Extensão de sintaxe |
+| Criar e gerenciar componentes | Parece HTML dentro do JavaScript |
+| Gerenciar estado (state) | É completamente OPCIONAL |
+| Gerenciar ciclo de vida | É transformado para JavaScript |
+| Implementar Virtual DOM | Torna código mais legível |
+| Realizar reconciliação | Suporta expressões JavaScript |
+
+## Como JSX Funciona
+
+JSX é transformado em código JavaScript puro pelo Babel (ou outro compilador). Veja o processo:
+
+<CodeTable columns={[
+  { id: 'jsx-code', title: 'Você Escreve (JSX)' },
+  { id: 'js-code', title: 'Babel Transforma (JavaScript)' }
+]}>
+  <div data-code-column="jsx-code">
+
+```jsx
+// JSX: Sintaxe familiar e legível
+const element = (
+  <div className="container">
+    <h1>Olá, {name}!</h1>
+    <p>Bem-vindo ao React</p>
+  </div>
+);
+```
+
+**Parece HTML**, mas é JavaScript disfarçado!
+
+  </div>
+
+  <div data-code-column="js-code">
+
+```javascript
+// JavaScript puro: Como React realmente vê
+const element = React.createElement(
+  'div',
+  { className: 'container' },
+  React.createElement('h1', null, 'Olá, ', name, '!'),
+  React.createElement('p', null, 'Bem-vindo ao React')
+);
+```
+
+**Chamadas de função** aninhadas.
+
+  </div>
+</CodeTable>
+
+### Transformação Passo a Passo
+
+```jsx
+// JSX é lido
+<button onClick={handleClick}>Clique aqui</button>
+
+// Babel transforma para
+React.createElement('button', { onClick: handleClick }, 'Clique aqui')
+
+// 3. React.createElement retorna um objeto
+{
+  type: 'button',
+  props: {
+    onClick: handleClick,
+    children: 'Clique aqui'
+  },
+  key: null,
+  ref: null
+}
+
+// 4. React usa esse objeto para criar o elemento DOM
+<button>Clique aqui</button>
+```
+
+## Por que Usar JSX?
+
+<Tabs tabs={[
+  { id: 'sem-jsx', label: 'Sem JSX' },
+  { id: 'com-jsx', label: 'Com JSX' }
+]}>
+  <div data-tab-content="sem-jsx">
+
+```javascript
+function TodoList({ todos }) {
+  return React.createElement(
+    'div',
+    { className: 'todo-container' },
+    React.createElement(
+      'h2',
+      null,
+      'Minhas Tarefas'
+    ),
+    React.createElement(
+      'ul',
+      { className: 'todo-list' },
+      todos.map(todo =>
+        React.createElement(
+          'li',
+          { 
+            key: todo.id,
+            className: todo.completed ? 'completed' : ''
+          },
+          React.createElement(
+            'input',
+            {
+              type: 'checkbox',
+              checked: todo.completed,
+              onChange: () => toggleTodo(todo.id)
+            }
+          ),
+          React.createElement('span', null, todo.text)
+        )
+      )
+    )
+  );
+}
+```
+
+  </div>
+
+  <div data-tab-content="com-jsx">
+
+```jsx
+function TodoList({ todos }) {
+  return (
+    <div className="todo-container">
+      <h2>Minhas Tarefas</h2>
+      <ul className="todo-list">
+        {todos.map(todo => (
+          <li 
+            key={todo.id}
+            className={todo.completed ? 'completed' : ''}
+          >
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => toggleTodo(todo.id)}
+            />
+            <span>{todo.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+  </div>
+</Tabs>
+
+**Sem JSX - Problemas:**
+- Difícil de ler e entender a estrutura
+- Muitos parênteses e vírgulas
+- Fácil cometer erros de sintaxe
+- Difícil de manter
+
+**Com JSX - Vantagens:**
+- Estrutura clara e visual
+- Parece HTML familiar
+- Fácil de ler e manter
+- Menos propenso a erros
+
+## Benefícios do JSX
+
+### 1. **Legibilidade**
+```jsx
+<Card title="React" description="Biblioteca JavaScript" />
+
+React.createElement(Card, { title: "React", description: "Biblioteca JavaScript" })
+```
+
+### 2. **Segurança (Previne XSS)**
+```jsx
+const userInput = '<script>alert("hack")</script>';
+
+// ✅ JSX escapa automaticamente
+<div>{userInput}</div>
+// Renderiza: &lt;script&gt;alert("hack")&lt;/script&gt;
+
+// ❌ Perigoso (não use!)
+<div dangerouslySetInnerHTML={{ __html: userInput }} />
+```
+
+### 4. **Expressões JavaScript**
+```jsx
+// ✅ Qualquer expressão JS entre {}
+<div>
+  {/* Variáveis */}
+  <h1>{title}</h1>
+  
+  {/* Operações */}
+  <p>Preço: R$ {price * 1.1}</p>
+  
+  {/* Condicionais */}
+  {isLoggedIn ? <Dashboard /> : <Login />}
+  
+  {/* Loops */}
+  {items.map(item => <Item key={item.id} {...item} />)}
+  
+  {/* Funções */}
+  <button onClick={() => setCount(count + 1)}>
+    Cliques: {count}
+  </button>
+</div>
+```
+
+## Regras do JSX
+
+### 1. **Um Único Elemento Raiz**
+```jsx
+// ❌ ERRADO: Múltiplos elementos raiz
+function Component() {
+  return (
+    <h1>Título</h1>
+    <p>Parágrafo</p>
+  );
+}
+
+// ✅ CORRETO: Envolver em um elemento
+function Component() {
+  return (
+    <div>
+      <h1>Título</h1>
+      <p>Parágrafo</p>
+    </div>
+  );
+}
+
+// ✅ CORRETO: Usar Fragment (não cria elemento extra no DOM)
+function Component() {
+  return (
+    <>
+      <h1>Título</h1>
+      <p>Parágrafo</p>
+    </>
+  );
+}
+```
+
+### 2. **Fechar Todas as Tags**
+```jsx
+// ❌ ERRADO: Tags não fechadas
+<img src="logo.png">
+<input type="text">
+
+// ✅ CORRETO: Auto-fechar tags sem filhos
+<img src="logo.png" />
+<input type="text" />
+```
+
+### 3. **className em vez de class**
+```jsx
+// ❌ ERRADO: 'class' é palavra reservada em JS
+<div class="container">
+
+// ✅ CORRETO: Use 'className'
+<div className="container">
+```
+
+### 4. **Propriedades em camelCase**
+```jsx
+// ❌ HTML tradicional
+<div onclick="handleClick()" tabindex="0">
+
+// ✅ JSX em camelCase
+<div onClick={handleClick} tabIndex={0}>
+```
+
+## JSX vs Templates
+
+<CodeTable columns={[
+  { id: 'templates', title: 'Templates (Vue, Angular)' },
+  { id: 'jsx-power', title: 'JSX (React)' }
+]}>
+  <div data-code-column="templates">
+
+```html
+<!-- Vue/Angular: Sintaxe especial -->
+<div v-if="isVisible">
+  <p v-for="item in items">
+    {{ item.name }}
+  </p>
+</div>
+
+<!-- Diretivas especiais -->
+- v-if, v-for, v-bind
+- *ngIf, *ngFor
+- Linguagem de template própria
+```
+
+  </div>
+
+  <div data-code-column="jsx-power">
+
+```jsx
+// React: JavaScript puro
+<div>
+  {isVisible && (
+    items.map(item => (
+      <p key={item.id}>{item.name}</p>
+    ))
+  )}
+</div>
+
+// Apenas JavaScript
+- if/else nativo
+- map/filter/reduce
+- Qualquer expressão JS
+```
+
+  </div>
+</CodeTable>
+
+**Templates (Vue/Angular) - Limitações:**
+- Menos complexoidade
+- Menos poder do JavaScript
+- Lógica separada do template
+
+**JSX (React) - Vantagens:**
+- Usa JavaScript
+- Flexibilidade
+- Lógica e UI juntas
+
+
+## Sources
+
+* https://legacy.reactjs.org/docs/introducing-jsx.html
+* https://www.youtube.com/watch?v=XxVg_s8xAms
+* https://www.youtube.com/watch?v=GW0rj4sNH2w
+* https://blog.risingstack.com/the-history-of-react-js-on-a-timeline/
